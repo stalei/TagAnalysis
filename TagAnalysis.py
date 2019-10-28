@@ -22,6 +22,7 @@ print(halo.shape)
 x=halo['X']
 y=halo['Y']
 z=halo['Z']
+zz=halo['ZZ']
 
 print(len(x))
 
@@ -64,11 +65,19 @@ mass_new=mass_2[x_2<19]
 #X, Z =np.meshgrid(x_new,z_new)
 #fig3, ax3=plt.subplots()
 fig3= plt.figure(3)
-ax3=fig3.add_subplot(111)
+#ax3=fig3.add_subplot(111)
 #ax3.contour(X,Z,mass_new)
-viridis = cm.get_cmap('viridis', 256)#np.max(mass_new))
-psm=ax3.pcolormesh([x_new,z_new],cmap=viridis, rasterized=True)
-fig3.colorbar(psm,ax=ax3)
+#viridis = cm.get_cmap('viridis', 256)#np.max(mass_new))
+#psm=ax3.pcolormesh([x_new,z_new],cmap=viridis, rasterized=True)
+#fig3.colorbar(psm,ax=ax3)
+
+
+#plot cmap = 'RdPu'
+plt.scatter(x,z , c=zz,cmap = 'viridis', s =2, alpha =0.8)
+cbar = plt.colorbar()
+
+
+
 
 
 
