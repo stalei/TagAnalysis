@@ -73,15 +73,15 @@ fig3= plt.figure(3)
 
 
 #plot cmap = 'RdPu'
-plt.scatter(x,z , c=np.log10(metallicity),cmap = 'viridis', s =2, alpha =0.8)
+plt.scatter(x,z , c=np.log10(metallicity),cmap = 'gist_earth', s =2, alpha =0.8)
 cbar = plt.colorbar()
 plt.title("metallicity")
 fig4=plt.figure(4)
-plt.scatter(x,z , c=StellarMass,cmap = 'viridis', s =2, alpha =0.8)
+plt.scatter(x,z , c=StellarMass,cmap = 'gist_earth', s =2, alpha =0.8)
 cbar = plt.colorbar()
 plt.title("StellarMass")
 fig5=plt.figure(5)
-plt.scatter(x,z , c=age,cmap = 'viridis', s =2, alpha =0.8)
+plt.scatter(x,z , c=age,cmap = 'gist_earth', s =2, alpha =0.8)
 cbar = plt.colorbar()
 plt.title("age")
 
