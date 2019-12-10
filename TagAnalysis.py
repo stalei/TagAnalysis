@@ -12,7 +12,7 @@ from matplotlib.legend_handler import HandlerLine2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
-
+import argparse
 #How to use: $python TagAnalysis.py HDf_tag_file
 #example: python TagAnalysis.py StellarHalo.h5
 
@@ -20,9 +20,10 @@ from matplotlib import cm
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("TagFile", type=str)
-    #f=h5.File("StellarHalo.h5","r")
-    f=h5.File(TagFile,"r")
     args = parser.parse_args()
+    #f=h5.File("StellarHalo.h5","r")
+    f=h5.File(args.TagFile,"r")
+
     #
     datasetNames = [n for n in f.keys()]
     for n in datasetNames:
@@ -35,10 +36,15 @@ if __name__ == "__main__":
     x=halo['X']
     y=halo['Y']
     z=halo['Z']
+    Mv=halo['Mvir']
+    Hindex=halo['HaloIndex']
     #
-    #
+    # get totals for differenthalos
+    min=np.min(Hindex)
+    max=np.max(Hindex)
+    print(min,max)
     print(len(x))
-    print(metallicity)
+    #print(metallicity)
     #    #
     #
     fig = plt.figure(figsize=plt.figaspect(1))
