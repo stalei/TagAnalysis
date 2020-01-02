@@ -39,12 +39,16 @@ if __name__ == "__main__":
     Mv=halo['Mvir']
     Hindex=halo['HaloIndex']
     #
-    # get totals for differenthalos
+    # get totals for different halos
     min=np.min(Hindex)
     max=np.max(Hindex)
     print(min,max)
     print(len(x))
     #print(metallicity)
+    #min max didn't work so let's find another way to get the total properities
+    #metalicity-halo mass dependence
+    #metalicity of the halo is the average metalicity
+    
     #    #
     #
     fig = plt.figure(figsize=plt.figaspect(1))
