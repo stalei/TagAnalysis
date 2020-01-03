@@ -46,9 +46,12 @@ if __name__ == "__main__":
     print(len(x))
     #print(metallicity)
     #min max didn't work so let's find another way to get the total properities
+    #checking power law distribution
+    #
+    #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
-    
+
     #    #
     #
     fig = plt.figure(figsize=plt.figaspect(1))
