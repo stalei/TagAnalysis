@@ -79,6 +79,18 @@ if __name__ == "__main__":
         pAge=age[r<Rvh]
         pStellarMass=StellarMass[r<Rvh]
         pMetallicity=metallicity[r<Rvh]
+        Rbins=np.linspace(0,self.Rv,NBins+1)
+        NBins=6
+        Rs=[0]*NBins
+        Rho=[0]*NBins
+        for i in range(0,NBins):
+            Rin=Rbins[i]
+            Rout=Rbins[i+1]
+            Rs[i]=(Rbins[i]+Rbins[i+1])/2.
+            rbin=r[(r>Rin) & (r<Rout)]
+            v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
+            Rho[i]=len(rbin)/v
+
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
