@@ -13,17 +13,25 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import argparse
-#How to use: $python TagAnalysis.py HDf_tag_file
-#example: python TagAnalysis.py StellarHalo.h5
+#How to use: $python TagAnalysis.py HDf_tag_file halo_catalog
+#example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("TagFile", type=str)
+    parser.add_argument("HaloFile", type=str)
     args = parser.parse_args()
     #f=h5.File("StellarHalo.h5","r")
     f=h5.File(args.TagFile,"r")
-
+    halos=np.genfromtxt(args.HaloFile, skip_header=18)
+    pnumh=np.array(halos[:,1])
+    MvH=np.array(halos[:,2])
+    RvH=np.array(halos[:,4])# in kpc
+    xH=np.array(halos[:,8])
+    yH=np.array(halos[:,9])
+    zH=np.array(halos[:,10])
+    IdH=np.array(halos[:,0])
     #
     datasetNames = [n for n in f.keys()]
     for n in datasetNames:
