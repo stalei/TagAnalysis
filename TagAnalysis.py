@@ -32,6 +32,17 @@ if __name__ == "__main__":
     yH=np.array(halos[:,9])
     zH=np.array(halos[:,10])
     IdH=np.array(halos[:,0])
+    #extract halox in a specific mass range, MWish for instance
+    LowerMass=1.7e11
+    UpperMass=1.4e12
+    ph=pnumh[(MvH>LowerMass) & (MvH<UpperMass)]
+    Idh=IdH[(MvH>LowerMass) & (MvH<UpperMass)]
+    Mvh=MvH[(MvH>LowerMass) & (MvH<UpperMass)]
+    xh=xH[(MvH>LowerMass) & (MvH<UpperMass)]
+    yh=yH[(MvH>LowerMass) & (MvH<UpperMass)]
+    zh=zH[(MvH>LowerMass) & (MvH<UpperMass)]
+    Rvh=RvH[(MvH>LowerMass) & (MvH<UpperMass)]
+    Rvh/=1000 # convert from kpc to Mpc
     #
     datasetNames = [n for n in f.keys()]
     for n in datasetNames:
@@ -56,6 +67,18 @@ if __name__ == "__main__":
     #min max didn't work so let's find another way to get the total properities
     #checking power law distribution
     #
+    for i in range(0,len(Idh)):
+        dx2=(xh-x)**2.
+        dy2=(yh-y)**2.
+        dz2=(zh-z)**2.
+        r=np.sqrt(dx2+dy2+dz2)
+        #now extract tagged particles within this halos virial radius
+        px=x[r<Rvh]
+        py=y[r<Rvh]
+        pz=z[r<Rvh]
+        pAge=age[r<Rvh]
+        pStellarMass=StellarMass[r<Rvh]
+        pMetallicity=metallicity[r<Rvh]
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
