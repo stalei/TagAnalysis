@@ -33,8 +33,8 @@ if __name__ == "__main__":
     zH=np.array(halos[:,10])
     IdH=np.array(halos[:,0])
     #extract halox in a specific mass range, MWish for instance
-    LowerMass=1.7e11
-    UpperMass=1.4e12
+    LowerMass=1.9e11
+    UpperMass=1.3e12
     ph=pnumh[(MvH>LowerMass) & (MvH<UpperMass)]
     Idh=IdH[(MvH>LowerMass) & (MvH<UpperMass)]
     Mvh=MvH[(MvH>LowerMass) & (MvH<UpperMass)]
@@ -67,20 +67,21 @@ if __name__ == "__main__":
     #min max didn't work so let's find another way to get the total properities
     #checking power law distribution
     #
+    NBins=6
     for i in range(0,len(Idh)):
-        dx2=(xh-x)**2.
-        dy2=(yh-y)**2.
-        dz2=(zh-z)**2.
+        dx2=(xh[i]-x)**2.
+        dy2=(yh[i]-y)**2.
+        dz2=(zh[i]-z)**2.
         r=np.sqrt(dx2+dy2+dz2)
         #now extract tagged particles within this halos virial radius
-        px=x[r<Rvh]
-        py=y[r<Rvh]
-        pz=z[r<Rvh]
-        pAge=age[r<Rvh]
-        pStellarMass=StellarMass[r<Rvh]
-        pMetallicity=metallicity[r<Rvh]
-        Rbins=np.linspace(0,self.Rv,NBins+1)
-        NBins=6
+        px=x[r<Rvh[i]]
+        py=y[r<Rvh[i]]
+        pz=z[r<Rvh[i]]
+        pAge=age[r<Rvh[i]]
+        pStellarMass=StellarMass[r<Rvh[i]]
+        pMetallicity=metallicity[r<Rvh[i]]
+        Rbins=np.linspace(0,Rvh[i],NBins+1)
+
         Rs=[0]*NBins
         Rho=[0]*NBins
         for i in range(0,NBins):
@@ -90,7 +91,9 @@ if __name__ == "__main__":
             rbin=r[(r>Rin) & (r<Rout)]
             v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
             Rho[i]=len(rbin)/v
-
+        fig0=plt.figure(0)
+        ax0=fig0.add_subplot(111)
+        ax0.plot(Rho,Rs)
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
@@ -140,4 +143,6 @@ if __name__ == "__main__":
     plt.scatter(x,z , c=age,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
     plt.title("age")
+    #Halo plots
+
     plt.show()
