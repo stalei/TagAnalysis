@@ -33,7 +33,7 @@ if __name__ == "__main__":
     zH=np.array(halos[:,10])
     IdH=np.array(halos[:,0])
     #extract halox in a specific mass range, MWish for instance
-    LowerMass=1.9e11
+    LowerMass=1.0e12
     UpperMass=1.3e12
     ph=pnumh[(MvH>LowerMass) & (MvH<UpperMass)]
     Idh=IdH[(MvH>LowerMass) & (MvH<UpperMass)]
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             Rho[i]=len(rbin)/v
         fig0=plt.figure(0)
         ax0=fig0.add_subplot(111)
-        ax0.plot(Rho,Rs)
+        ax0.plot(np.log10(Rho),Rs)
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
