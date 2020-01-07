@@ -90,10 +90,13 @@ if __name__ == "__main__":
             Rs[i]=(Rbins[i]+Rbins[i+1])/2.
             rbin=r[(r>Rin) & (r<Rout)]
             v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
-            Rho[i]=len(rbin)/v
+            Rho[i]=len(rbin)/v # all p have the same mass but don't forget to convert the units
         fig0=plt.figure(0)
-        ax0=fig0.add_subplot(111)
-        ax0.plot(np.log10(Rho),Rs)
+        ax01=fig0.add_subplot(221)
+        ax01.plot(np.log10(Rho),Rs)
+        # metalicity at 30 kpc
+        metalBin=metallicity[(r>0.029) & (r<0.031)]
+        met=np.sum(metalBin)/len(metalBin)
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
