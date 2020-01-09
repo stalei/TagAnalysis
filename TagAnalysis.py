@@ -95,8 +95,11 @@ if __name__ == "__main__":
         ax01=fig0.add_subplot(221)
         ax01.plot(np.log10(Rho),Rs)
         # metalicity at 30 kpc
-        metalBin=metallicity[(r>0.029) & (r<0.031)]
+        metalBin=metallicity[(r>0.02) & (r<0.04)]
         met=np.sum(metalBin)/len(metalBin)
+        ax02=fig0.add_subplot(222)
+        ax02.plot(np.log10(Mvh[i]),met)
+        print(met)
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
