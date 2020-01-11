@@ -13,6 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import argparse
+import math
 #How to use: $python TagAnalysis.py HDf_tag_file halo_catalog
 #example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii
 
@@ -68,6 +69,9 @@ if __name__ == "__main__":
     #checking power law distribution
     #
     NBins=6
+    fig0=plt.figure(0)
+    ax01=fig0.add_subplot(221)
+    ax02=fig0.add_subplot(222)
     for i in range(0,len(Idh)):
         dx2=(xh[i]-x)**2.
         dy2=(yh[i]-y)**2.
@@ -81,7 +85,6 @@ if __name__ == "__main__":
         pStellarMass=StellarMass[r<Rvh[i]]
         pMetallicity=metallicity[r<Rvh[i]]
         Rbins=np.linspace(0,Rvh[i],NBins+1)
-
         Rs=[0]*NBins
         Rho=[0]*NBins
         for i in range(0,NBins):
@@ -91,14 +94,15 @@ if __name__ == "__main__":
             rbin=r[(r>Rin) & (r<Rout)]
             v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
             Rho[i]=len(rbin)/v # all p have the same mass but don't forget to convert the units
-        fig0=plt.figure(0)
-        ax01=fig0.add_subplot(221)
+        #fig0=plt.figure(0)
+        #ax01=fig0.add_subplot(221)
         ax01.plot(np.log10(Rho),Rs)
         # metalicity at 30 kpc
-        metalBin=metallicity[(r>0.02) & (r<0.04)]
+        metalBin=metallicity[(r>0.01) & (r<0.05)]
         met=np.sum(metalBin)/len(metalBin)
-        ax02=fig0.add_subplot(222)
-        ax02.plot(np.log10(Mvh[i]),met)
+        #ax02=fig0.add_subplot(222)
+        if not(math.isnan(met)):
+            ax02.plot(np.log10(Mvh[i]),np.log10(met))
         print(met)
     #
     #metalicity-halo mass dependence
