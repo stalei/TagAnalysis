@@ -62,9 +62,9 @@ if __name__ == "__main__":
     # get totals for different halos
     min=np.min(Hindex)
     max=np.max(Hindex)
-    print(min,max)
+    #print(min,max)
     print(len(x))
-    #print(metallicity)
+    print(len(StellarMass[StellarMass !=0]))
     #min max didn't work so let's find another way to get the total properities
     #checking power law distribution
     #
@@ -85,6 +85,7 @@ if __name__ == "__main__":
         pStellarMass=StellarMass[r<Rvh[i]]
         pMetallicity=metallicity[r<Rvh[i]]
         Rbins=np.linspace(0,Rvh[i],NBins+1)
+        print(Rbins)
         Rs=[0]*NBins
         Rho=[0]*NBins
         for i in range(0,NBins):
@@ -93,7 +94,10 @@ if __name__ == "__main__":
             Rs[i]=(Rbins[i]+Rbins[i+1])/2.
             rbin=r[(r>Rin) & (r<Rout)]
             v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
-            Rho[i]=len(rbin)/v # all p have the same mass but don't forget to convert the units
+            print(v)
+            #Rho[i]=len(rbin)/v # all p have the same mass but don't forget to convert the units
+            Rho[i]=np.sum(StellarMass[(r>Rin) & (r<Rout)])/v
+            print(Rho[i])
         #fig0=plt.figure(0)
         #ax01=fig0.add_subplot(221)
         ax01.plot(np.log10(Rho),Rs)
