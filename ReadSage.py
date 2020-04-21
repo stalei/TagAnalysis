@@ -9,10 +9,30 @@
 #read a sage files
 
 # $python ReadSage.py SageModelFile
-# $python ReadSage.py
+# $python ReadSage.py /media/shahram/SD/717/model_z0.000_0
 
+import argparse
+import codecs
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("SageFile", type=str)
-    
+    args = parser.parse_args()
+    #f=open(args.SageFile,"rb")
+    #line=f.readline()
+    #while line!='':
+    #    print(line)
+    #    line=f.readline()
+    ########
+    #t=next(f)
+    #t2=next(f)
+    #print(t2)
+    #num=list(f.read())
+    #print (num)
+    ########
+    with open(args.SageFile, mode='rb') as file: # b is important -> binary
+        fileContent = file.read()
+        print(fileContent)
+        base64_data = codecs.encode(fileContent, 'base64x')
+        print(base64_data)
+        file.close()

@@ -2,3 +2,6 @@
 *.bin
 *.ascii
 snap*
+*.txt
+model*
+ExportGalaxies

@@ -1,4 +1,4 @@
-#  © Shahram Talei @ 2019 The University of Alabama - All rights reserved.
+#  © Shahram Talei @ 2020 The University of Alabama - All rights reserved.
 #you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
 #the Free Software Foundation; either version 3 of the License, or
@@ -14,14 +14,16 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import argparse
 import math
-#How to use: $python TagAnalysis.py HDf_tag_file halo_catalog
-#example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii
+#import csv
+#How to use: $python TagAnalysis.py HDf_tag_file halo_catalog galaxy_file
+#example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii gal.csv
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("TagFile", type=str)
     parser.add_argument("HaloFile", type=str)
+    parser.add_argument("GalFile", type=str)
     args = parser.parse_args()
     #f=h5.File("StellarHalo.h5","r")
     f=h5.File(args.TagFile,"r")
@@ -124,7 +126,12 @@ if __name__ == "__main__":
     #
     #metalicity-halo mass dependence
     #metalicity of the halo is the average metalicity
-
+    #
+    # Galaxy plots
+    Gals=np.genfromtxt(args.GalFile, delimiter = ',')
+    Gx=np.array(Gals[:,0])
+    Gy=np.array(Gals[:,1])
+    Gz=np.array(Gals[:,2])
     #    #
     #
     fig = plt.figure(figsize=plt.figaspect(1))
@@ -159,17 +166,22 @@ if __name__ == "__main__":
     #psm=ax3.pcolormesh([x_new,z_new],cmap=viridis, rasterized=True)
     #fig3.colorbar(psm,ax=ax3)
     #plot cmap = 'RdPu'
-    plt.scatter(x,z , c=np.log10(metallicity),cmap = 'gist_earth', s =2, alpha =0.8)
+    plt.scatter(x,z , c=np.log10(metallicity),cmap = 'gist_earth', s =2, alpha =0.9)
     cbar = plt.colorbar()
+    plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("metallicity")
     fig4=plt.figure(4)
     plt.scatter(x,z , c=StellarMass,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
+    plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("StellarMass")
     fig5=plt.figure(5)
     plt.scatter(x,z , c=age,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
+    plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("age")
     #Halo plots
+    #
+
 
     plt.show()
