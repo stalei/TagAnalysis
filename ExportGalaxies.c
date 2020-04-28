@@ -203,7 +203,7 @@ void LoadSageFiles(int snap)
 void ReadSage(int snap)
 {
 
-printf("Extracting information from the sage file.\n");
+//printf("Extracting information from the sage file.\n");
 LoadSageFiles(snap);
 fflush(stdout);
 NumGalaxies = ReadSageHeader(SageFilesCount,SageFilesPath);
@@ -249,7 +249,7 @@ return;
 }
 void ExportGalaxy(struct SageGalaxies *Output, int id)
 {
-  printf("%g,%g,%g\n",Output[id].Pos[0], Output[id].Pos[1],Output[id].Pos[2]);
+  printf("%g,%g,%g,%g,%g,%g\n",Output[id].Pos[0], Output[id].Pos[1],Output[id].Pos[2],Output[id].Mvir*(1.0e10),Output[id].Rvir, Output[id].DiskScaleRadius);
 }
 
 int main()
