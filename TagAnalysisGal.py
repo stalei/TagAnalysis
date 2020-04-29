@@ -106,20 +106,22 @@ if __name__ == "__main__":
     #now extract tagged particles within this halos virial radius
     ###########
     #
-    px=x[r<Rvh]
-    py=y[r<Rvh]
-    pz=z[r<Rvh]
-    pAge=age[r<Rvh]
-    pStellarMass=StellarMass[r<Rvh]
-    pMetallicity=metallicity[r<Rvh]
-    Rbins=np.linspace(0,Rvh,NBins+1)
+    px=x[r<GRv]
+    py=y[r<GRv]
+    pz=z[r<GRv]
+    pAge=age[r<GRv]
+    pStellarMass=StellarMass[r<GRv]
+    pMetallicity=metallicity[r<GRv]
+    #Rbins=np.linspace(0,Rvh,NBins+1)
+    Rbins=np.linspace(0,GRv,NBins+1)
     print(Rbins)
     Rs=[0]*NBins
     Rho=[0]*NBins
+    Z=[0]*NBins
     for i in range(0,NBins):
         Rin=Rbins[i]
         Rout=Rbins[i+1]
-        Rs[i]=(Rbins[i]+Rbins[i+1])/2.
+        Rs[i]=(Rbins[i]+Rbins[i+1])*500. #(Rbins[i]+Rbins[i+1])/2. x 1000
         rbin=r[(r>Rin) & (r<Rout)]
         v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
         print(v)
@@ -130,8 +132,8 @@ if __name__ == "__main__":
     #ax01=fig0.add_subplot(221)
 
     # metalicity at 30 kpc
-    metalBin=metallicity[(r>0.01) & (r<0.05)]
-    met=np.sum(metalBin)/len(metalBin)
+        metalBin=metallicity[(r>0.01) & (r<0.05)]
+        Z[i]=np.sum(metalBin)/len(metalBin)
     #ax02=fig0.add_subplot(222)
     #if not(math.isnan(met)):
         #ax02.plot(np.log10(Mvh[i]),np.log10(met))
@@ -150,9 +152,17 @@ if __name__ == "__main__":
 
     fig0=plt.figure(0)
     ax01=fig0.add_subplot(221)
-    ax01.plot(np.log10(Rho),Rs)
+    ax01.plot(Rs,np.log10(Rho))
+    ax01.set_xlabel("R(kpc)")
+    ax01.set_ylabel("$log(rho) [M_odot /kpc^{-3}]$")
     ax02=fig0.add_subplot(222)
-
+    ax02.hist(pAge,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
+    ax02.set_xlabel("Age")
+    ax03=fig0.add_subplot(223)
+    ax03.hist(pMetallicity,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
+    ax03.set_xlabel("Metallicity")
+    ax04=fig0.add_subplot(224)
+    ax04.plot(Rs,Z)
     #for i in range(0,len(Idh)):
 
     #
