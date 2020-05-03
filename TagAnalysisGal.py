@@ -85,14 +85,14 @@ if __name__ == "__main__":
     BE0=halo['BindingEnergy']
     print(BE0)
     #
-    age=age0#[BE0!=0]
-    StellarMass=StellarMass0*(1.0e10)#[BE0!=0]*(1.0e10)
-    metallicity=metallicity0#[BE0!=0]
-    x=x0#[BE0!=0]
-    y=y0#[BE0!=0]
-    z=z0#[BE0!=0]
-    Mv=Mv0#[BE0!=0]
-    Hindex=Hindex0#[BE0!=0]
+    age=age0[BE0!=0]
+    StellarMass=StellarMass0[BE0!=0]*(1.0e10)
+    metallicity=metallicity0[BE0!=0]
+    x=x0[BE0!=0]
+    y=y0[BE0!=0]
+    z=z0[BE0!=0]
+    Mv=Mv0[BE0!=0]
+    Hindex=Hindex0[BE0!=0]
     ##Extract particles for this specific halo/galaxy
     #halo
     #dx2=(xh-x)**2.
