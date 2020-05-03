@@ -86,6 +86,7 @@ struct SageGalaxies
  float infallVvir;
  float infallVmax;
  float r_heat;
+ double Stars;
 
 }*SageOutput;
 //typedef struct SageGalaxies
