@@ -84,6 +84,7 @@ if __name__ == "__main__":
     Hindex0=halo['HaloIndex']
     BE0=halo['BindingEnergy']
     TreeIndex0=halo['TreeIndex']
+    infallMvir0=halo['LastMajorMerger']
     print(BE0)
     #
     age=age0[BE0!=0]
@@ -96,6 +97,7 @@ if __name__ == "__main__":
     Hindex=Hindex0[BE0!=0]
     TreeIndex=TreeIndex0[BE0!=0]
     UTree = set(TreeIndex)
+    infallMvir=infallMvir0[BE0!=0]
     print("TreeIndex:%d out of %d"%(len(UTree),len(TreeIndex0)))
     print(UTree)
     ##Extract particles for this specific halo/galaxy
@@ -120,10 +122,14 @@ if __name__ == "__main__":
     pTreeIndex=TreeIndex[r<GRv]
     #
     UTree2 = set(pTreeIndex)
+    pinfallMvir=infallMvir[r<GRv]
     print("TreeIndex2:%d out of %d"%(len(UTree2),len(pTreeIndex)))
     print(UTree2)
+    print("infallMvir:")
+    print(pinfallMvir[pTreeIndex==0])
     #Rbins=np.linspace(0,Rvh,NBins+1)
     Rbins=np.linspace(0,GRv,NBins+1)
+    print("Bins:")
     print(Rbins)
     Rs=[0]*NBins
     Rho=[0]*NBins
@@ -133,7 +139,7 @@ if __name__ == "__main__":
         Rout=Rbins[i+1]
         Rs[i]=(Rbins[i]+Rbins[i+1])*500. #(Rbins[i]+Rbins[i+1])/2. x 1000
         rbin=r[(r>Rin) & (r<Rout)]
-        v=(4./3.)*np.pi*(Rout**3.-Rin**3.)
+        v=(4./3.)*np.pi*(Rout**3.-Rin**3.)*1.0e9 #r_Mpc to r_kpc (r^3)
         print(v)
         #Rho[i]=len(rbin)/v # all p have the same mass but don't forget to convert the units
         Rho[i]=np.sum(StellarMass[(r>Rin) & (r<Rout)])/v
@@ -142,9 +148,12 @@ if __name__ == "__main__":
     #ax01=fig0.add_subplot(221)
 
     # metalicity at 30 kpc
-        metalBin=metallicity[(r>0.01) & (r<0.05)]
-        Z[i]=np.sum(metalBin)/len(metalBin)
+        metalBin=pMetallicity#[(r>0.0) & (r<0.1)]
+        Z[i]=np.sum(metalBin)#/len(metalBin)
     #ax02=fig0.add_subplot(222)
+    print(pMetallicity)
+    print("z30:")
+    print(Z)
     #if not(math.isnan(met)):
         #ax02.plot(np.log10(Mvh[i]),np.log10(met))
     #print(met)
@@ -162,9 +171,9 @@ if __name__ == "__main__":
 
     fig0=plt.figure(0)
     ax01=fig0.add_subplot(221)
-    ax01.plot(Rs,np.log10(Rho))
-    ax01.set_xlabel("R(kpc)")
-    ax01.set_ylabel("$log(rho) [M_odot /kpc^{-3}]$")
+    ax01.plot(np.log10(Rs),np.log10(Rho))
+    ax01.set_xlabel("$log(R(kpc))$")
+    ax01.set_ylabel("$log(\\rho) [M_\\odot /kpc^{-3}]$")
     ax02=fig0.add_subplot(222)
     ax02.hist(pAge,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
     ax02.set_xlabel("Age")
@@ -191,9 +200,9 @@ if __name__ == "__main__":
     ax.set_ylabel('Y (Mpc)')
     ax.set_zlabel('Z (Mpc)')
     #
-    fig2 = plt.figure(2)
+    fig2 = plt.figure(2,figsize=plt.figaspect(1))
     ax2 = fig2.add_subplot(111)#, projection='3d')
-    ax2.plot(px,pz,'k.', markersize=1)
+    ax2.plot(px[pTreeIndex!=0],pz[pTreeIndex!=0],'k.', markersize=1)
     #fig.set_size_inches(14,8)
     ax2.set_xlabel('X (Mpc)')
     ax2.set_ylabel('Z (Mpc)')
@@ -208,7 +217,7 @@ if __name__ == "__main__":
     #mass_new=mass_new.reshape(len(x_new),len(z_new))
     #X, Z =np.meshgrid(x_new,z_new)
     #fig3, ax3=plt.subplots()
-    fig3= plt.figure(3)
+    fig3= plt.figure(3,figsize=plt.figaspect(1))
     #ax3=fig3.add_subplot(111)
     #ax3.contour(X,Z,mass_new)
     #viridis = cm.get_cmap('viridis', 256)#np.max(mass_new))
@@ -219,16 +228,22 @@ if __name__ == "__main__":
     cbar = plt.colorbar()
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("metallicity")
-    fig4=plt.figure(4)
+    fig4=plt.figure(4,figsize=plt.figaspect(1))
     plt.scatter(px,pz , c=pStellarMass,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("StellarMass ($M_{\odot}$)")
-    fig5=plt.figure(5)
-    plt.scatter(px,pz , c=pTreeIndex,cmap = 'gist_earth', s =2, alpha =0.8)
+    fig5=plt.figure(5,figsize=plt.figaspect(1))
+    plt.scatter(px,pz , c=pAge,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("age (Gyr)")
+    # TreeIndex
+    fig6=plt.figure(6,figsize=plt.figaspect(1))
+    plt.scatter(px,pz , c=pTreeIndex,cmap = 'gist_earth', s =2, alpha =0.8)
+    cbar = plt.colorbar()
+    plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
+    plt.title("Tree Index")
     #Halo plots
     #
 
