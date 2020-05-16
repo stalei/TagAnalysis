@@ -15,42 +15,25 @@ from matplotlib import cm
 import argparse
 import math
 #import csv
-#How to use: $python Accretion.py HDf_tag_file halo_catalog galaxy_file
-#example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii gal.csv
+#How to use: $python AccretionV2.py HDf_tag_file FirstTagged galaxies_file
+#example: python TagAnalysis.py StellarHalo.h5 FirstTagged.h5 gals.ascii
 #This works for a single halo/galaxy
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("TagFile", type=str)
-    parser.add_argument("HaloFile", type=str)
-    parser.add_argument("GalFile", type=str)
+    parser.add_argument("FirstTag", type=str)
+    parser.add_argument("GalDirectory", type=str)
     args = parser.parse_args()
     #f=h5.File("StellarHalo.h5","r")
-    f=h5.File(args.TagFile,"r")
-    #Halo
-    halos=np.genfromtxt(args.HaloFile, skip_header=18)
-    pnumh=np.array(halos[:,1])
-    MvH=np.array(halos[:,2])
-    RvH=np.array(halos[:,4])# in kpc
-    xH=np.array(halos[:,8])
-    yH=np.array(halos[:,9])
-    zH=np.array(halos[:,10])
-    IdH=np.array(halos[:,0])
+    TagFF=h5.File(args.TagFile,"r")
+    TagIF=h5.File(args.FirstTag,"r")
     #extract halox in a specific mass range, MWish for instance
     LowerMass=1.0e12
     UpperMass=1.3e12
     NBins=6
     #
-    ph=pnumh[(MvH>LowerMass) & (MvH<UpperMass)]
-    Idh=IdH[(MvH>LowerMass) & (MvH<UpperMass)]
-    Mvh=MvH[(MvH>LowerMass) & (MvH<UpperMass)]
-    xh=xH[(MvH>LowerMass) & (MvH<UpperMass)]
-    yh=yH[(MvH>LowerMass) & (MvH<UpperMass)]
-    zh=zH[(MvH>LowerMass) & (MvH<UpperMass)]
-    Rvh=RvH[(MvH>LowerMass) & (MvH<UpperMass)]
-    Rvh/=1000 # convert from kpc to Mpc
-    #
-    # Galaxy
+    # Galaxies
     Gals=np.genfromtxt(args.GalFile, delimiter = ',')
     Gx0=np.array(Gals[:,0])
     Gy0=np.array(Gals[:,1])
@@ -58,76 +41,135 @@ if __name__ == "__main__":
     GMv0=np.array(Gals[:,3])
     GRv0=np.array(Gals[:,4])
     GRd0=np.array(Gals[:,5])
-    Gx=Gx0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    Gy=Gy0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    Gz=Gz0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    GMv=GMv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    GRv=GRv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    GRd=GRd0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    if len(GMv)>1 or len(Mvh)>1:
-        print("I got more than one halo/galaxy. I'd better stop")
-        exit(1)
-    #
-    datasetNames = [n for n in f.keys()]
+    GSnap=np.array(Gals[:,6])
+    datasetNames = [n for n in TagFF.keys()]
     for n in datasetNames:
         print(n)
-    halo=f['FinalTag'] # for full tag
+    #Tagged Particles
+    ####################################
+    #Final Tag
+    TagsF=TagFF['FinalTag'] # for full tag
     #halo=f['FullTag'] # for individual tags
-    age0=halo['Age']
-    StellarMass0=halo['StellarMass']
-    metallicity0=halo['ZZ']
-    print(halo.shape)
-    x0=halo['X']
-    y0=halo['Y']
-    z0=halo['Z']
-    Mv0=halo['Mvir']
-    Hindex0=halo['HaloIndex']
-    BE0=halo['BindingEnergy']
-    TreeIndex0=halo['TreeIndex']
-    infallMvir0=halo['infallMvir']
-    print(BE0)
+    IDF0=TagsF['PID']
+    ageF0=TagsF['Age']
+    StellarMassF0=TagsF['StellarMass']
+    metallicityF0=TagsF['ZZ']
+    print(TagsF.shape)
+    xF0=TagsF['X']
+    yF0=TagsF['Y']
+    zF0=TagsF['Z']
+    MvF0=TagsF['Mvir']
+    HindexF0=TagsF['HaloIndex']
+    BEF0=TagsF['BindingEnergy']
+    TreeIndexF0=TagsF['TreeIndex']
+    infallMvirF0=TagsF['LastMajorMerger']
+    SnapF0=TagsF['Snap']
     #
-    age=age0[BE0!=0]
-    StellarMass=StellarMass0[BE0!=0]#*(1.0e10)
-    metallicity=metallicity0[BE0!=0]/0.0134
-    x=x0[BE0!=0]
-    y=y0[BE0!=0]
-    z=z0[BE0!=0]
-    Mv=Mv0[BE0!=0]
-    Hindex=Hindex0[BE0!=0]
-    TreeIndex=TreeIndex0[BE0!=0]
-    UTree = set(TreeIndex)
-    infallMvir=infallMvir0[BE0!=0]
-    print("TreeIndex:%d out of %d"%(len(UTree),len(TreeIndex0)))
-    print(UTree)
+    IDF=IDF0[BEF0!=0]
+    ageF=ageF0[BEF0!=0]
+    StellarMassF=StellarMassF0[BEF0!=0]*(1.0e10)
+    metallicityF=metallicityF0[BEF0!=0]/0.0134
+    xF=xF0[BEF0!=0]
+    yF=yF0[BEF0!=0]
+    zF=zF0[BEF0!=0]
+    MvF=MvF0[BEF0!=0]
+    HindexF=HindexF0[BEF0!=0]
+    TreeIndexF=TreeIndexF0[BEF0!=0]
+    UTree = set(TreeIndexF)
+    infallMvirF=infallMvirF0[BEF0!=0]
+    #print("TreeIndex:%d out of %d"%(len(UTree),len(TreeIndex0)))
+    #print(UTree)
     ##Extract particles for this specific halo/galaxy
     #halo
     #dx2=(xh-x)**2.
     #dy2=(yh-y)**2.
     #dz2=(zh-z)**2.
-    #galaxy
-    dx2=(Gx-x)**2.
-    dy2=(Gy-y)**2.
-    dz2=(Gz-z)**2.
+    #the main galaxy
+    #################
+    #First tagged
+    TagsI=TagIF['FirstTagged'] # for full tag
+    #halo=f['FullTag'] # for individual tags
+    IDI0=TagsI['PID']
+    ageI0=TagsI['Age']
+    StellarMassI0=TagsI['StellarMass']
+    metallicityI0=TagsI['ZZ']
+    print(TagsI.shape)
+    xI0=TagsI['X']
+    yI0=TagsI['Y']
+    zI0=TagsI['Z']
+    MvI0=TagsI['Mvir']
+    HindexI0=TagsI['HaloIndex']
+    BEI0=TagsI['BindingEnergy']
+    TreeIndexI0=TagsI['TreeIndex']
+    infallMvirI0=TagsI['LastMajorMerger']
+    SnapI0=TagsI['Snap']
+    #
+    IDI=IDI0[BEI0!=0]
+    ageI=ageI0[BEI0!=0]
+    StellarMassI=StellarMassI0[BEI0!=0]#*(1.0e10) it is already converted in PtagPP
+    metallicityI=metallicityI0[BEI0!=0]/0.0134
+    xI=xI0[BEI0!=0]
+    yI=yI0[BEI0!=0]
+    zI=zI0[BEI0!=0]
+    MvF=MvF0[BEI0!=0]
+    HindexI=HindexI0[BEI0!=0]
+    TreeIndexI=TreeIndexI0[BEI0!=0]
+    UTree3 = set(TreeIndexI)
+    infallMvirI=infallMvirI0[BEI0!=0]
+    SnapI=SnapI0[BEI0!=0]
+    ##########################
+    # The main galaxy
+    S=SnapF0[0]
+    GMx0=Gx0[GSnap==S]
+    GMx0=Gy0[GSnap==S]
+    GMz0=Gz0[GSnap==S]
+    GMMv0=GMv0[GSnap==S]
+    GMRv0=GRv0[GSnap==S]
+    GMRd0=GRd0[GSnap==S]
+    Gx=GMx0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    Gy=GMy0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    Gz=GMz0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    GMv=GMMv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    GRv=GMRv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    GRd=GMRd0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    dx2=(Gx-xF)**2.
+    dy2=(Gy-yF)**2.
+    dz2=(Gz-zF)**2.
     r=np.sqrt(dx2+dy2+dz2)
     #now extract tagged particles within this halos virial radius
     ###########
+    # Extract particles in this galaxy
+    pID=IDF[r<GRv]
+    px=xF[r<GRv]
+    py=yF[r<GRv]
+    pz=zF[r<GRv]
+    pAge=ageF[r<GRv]
+    pStellarMass=StellarMassF[r<GRv]
+    pMetallicity=metallicityF[r<GRv]
+    pTreeIndex=TreeIndexF[r<GRv]
     #
-    px=x[r<GRv]
-    py=y[r<GRv]
-    pz=z[r<GRv]
-    pAge=age[r<GRv]
-    pStellarMass=StellarMass[r<GRv]
-    pMetallicity=metallicity[r<GRv]
-    pTreeIndex=TreeIndex[r<GRv]
-    #
-    UTree2 = set(pTreeIndex)
-    pinfallMvir=infallMvir[r<GRv]
-    print("TreeIndex2:%d out of %d"%(len(UTree2),len(pTreeIndex)))
-    print(UTree2)
-    print("infallMvir:")
-    print(pinfallMvir[pTreeIndex==0])
+    UTree2 = set(pTreeIndexF)
+    pinfallMvir=infallMvirF[r<GRv]
+    #print("TreeIndex2:%d out of %d"%(len(UTree2),len(pTreeIndex)))
+    #print(UTree2)
+    #print("infallMvir:")
+    #print(pinfallMvir[pTreeIndex==0])
     #Rbins=np.linspace(0,Rvh,NBins+1)
+    #
+    # Now we can find these particles in their first tagged positions
+    ppx=[0.0]*len(pID)
+    ppy=[0.0]*len(pID)
+    ppz=[0.0]*len(pID)
+    ppSnap=[0.0]*len(pID)
+    for i in range(0,len(pID)):
+        ppx[i]=xI[IDI==pID[i]]
+        ppy[i]=yI[IDI==pID[i]]
+        ppz[i]=zI[IDI==pID[i]]
+        ppSnap=SnapI[IDI==pID[i]]
+        Gx=Gx0[GSnap==ppSnap]
+        Gy=Gy0[GSnap==ppSnap]
+        Gz=Gz0[GSnap==ppSnap]
+    #Any kind of analysis after we extract these points
     Rbins=np.linspace(0,GRv,NBins+1)
     print("Bins:")
     print(Rbins)
@@ -168,7 +210,7 @@ if __name__ == "__main__":
     #min max didn't work so let's find another way to get the total properities
     #checking power law distribution
     #
-
+    #
     fig0=plt.figure(0)
     ax01=fig0.add_subplot(221)
     ax01.plot(np.log10(Rs),np.log10(Rho))
@@ -229,10 +271,10 @@ if __name__ == "__main__":
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("metallicity $log(Z/Z_{\\odot})$")
     fig4=plt.figure(4,figsize=plt.figaspect(1))
-    plt.scatter(px,pz , c=np.log10(pStellarMass),cmap = 'gist_earth', s =2, alpha =0.8)
+    plt.scatter(px,pz , c=pStellarMass,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
-    plt.title("StellarMass Log M ($M_{\odot}$)")
+    plt.title("StellarMass ($M_{\odot}$)")
     fig5=plt.figure(5,figsize=plt.figaspect(1))
     plt.scatter(px,pz , c=pAge,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()

@@ -16,7 +16,7 @@ from matplotlib import cm
 import argparse
 import math
 #import csv
-#How to use: $python TagAnalysis.py HDf_tag_file halo_catalog galaxy_file
+#How to use: $python TagAnalysisV2.py HDf_tag_file halo_catalog galaxy_file
 #example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii gal.csv
 #This code works for multiple halos.
 
@@ -52,6 +52,7 @@ if __name__ == "__main__":
     for n in datasetNames:
         print(n)
     halo=f['FinalTag'] # for full tag
+    #halo=f['FirstTagged']
     #halo=f['FullTag'] # for individual tags
     age0=halo['Age']
     StellarMass0=halo['StellarMass']

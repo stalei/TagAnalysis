@@ -15,7 +15,7 @@ from matplotlib import cm
 import argparse
 import math
 #import csv
-#How to use: $python TagAnalysis.py HDf_tag_file halo_catalog galaxy_file
+#How to use: $python TagAnalysisGal.py HDf_tag_file halo_catalog galaxy_file
 #example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii gal.csv
 #This works for a single halo/galaxy
 
