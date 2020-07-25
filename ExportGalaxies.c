@@ -21,7 +21,7 @@
 //#include <ctype.h>
 
 ////////////////////////////////////////////////////////////
-//// Definitios and variables
+//// Definitions and variables
 char SageDir[500];
 struct Path_Names
 {
@@ -250,7 +250,7 @@ return;
 }
 void ExportGalaxy(struct SageGalaxies *Output, int id)
 {
-  printf("%g,%g,%g,%g,%g,%g\n",Output[id].Pos[0], Output[id].Pos[1],Output[id].Pos[2],Output[id].Mvir*(1.0e10),Output[id].Rvir, Output[id].DiskScaleRadius);
+  printf("%g,%g,%g,%g,%g,%g,%g\n",Output[id].Pos[0], Output[id].Pos[1],Output[id].Pos[2],Output[id].Mvir*(1.0e10),Output[id].Rvir, Output[id].DiskScaleRadius,Output[id].StellarMass*(1.0e10));
 }
 
 int main()

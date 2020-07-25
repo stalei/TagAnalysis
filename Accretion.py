@@ -58,14 +58,21 @@ if __name__ == "__main__":
     GMv0=np.array(Gals[:,3])
     GRv0=np.array(Gals[:,4])
     GRd0=np.array(Gals[:,5])
+    GSM0=np.array(Gals[:,6])
+    #GSM0=np.array(Gals[:,6])
     Gx=Gx0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     Gy=Gy0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     Gz=Gz0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     GMv=GMv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     GRv=GRv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     GRd=GRd0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    GSM=GSM0[(GMv0>LowerMass) & (GMv0<UpperMass)]
+    #GSM=GSM0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     if len(GMv)>1 or len(Mvh)>1:
         print("I got more than one halo/galaxy. I'd better stop")
+        exit(1)
+    if len(GMv)==0:
+        print("I got no halo/galaxy. I'd better stop")
         exit(1)
     #
     datasetNames = [n for n in f.keys()]
@@ -189,7 +196,8 @@ if __name__ == "__main__":
     #metalicity of the halo is the average metalicity
     #
 
-    print(GMv,GRv,GRd)
+    print(GMv,GRv,GRd,GSM)
+    print(np.sum(pStellarMass))
     #    #
     #
     fig1 = plt.figure(figsize=plt.figaspect(1))

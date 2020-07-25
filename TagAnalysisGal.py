@@ -82,11 +82,14 @@ if __name__ == "__main__":
     z0=halo['Z']
     Mv0=halo['Mvir']
     Hindex0=halo['HaloIndex']
+    SubHIndex=halo['SubhaloIndex']
     BE0=halo['BindingEnergy']
-    print(BE0)
+    print("Halo Index:")
+    print(Hindex0[Hindex0 !=0])
+    print(SubHIndex[SubHIndex!=0])
     #
     age=age0[BE0!=0]
-    StellarMass=StellarMass0[BE0!=0]*(1.0e10)
+    StellarMass=StellarMass0[BE0!=0]#*(1.0e10)
     metallicity=metallicity0[BE0!=0]
     x=x0[BE0!=0]
     y=y0[BE0!=0]
@@ -148,8 +151,8 @@ if __name__ == "__main__":
     print(len(StellarMass[StellarMass !=0]))
     #min max didn't work so let's find another way to get the total properities
     #checking power law distribution
-    #
-
+    pMetallicitylog=np.log10(pMetallicity[pMetallicity !=0])
+    pMetallicitylog=pMetallicitylog[pMetallicitylog>-3]
     fig0=plt.figure(0)
     ax01=fig0.add_subplot(221)
     ax01.plot(Rs,np.log10(Rho))
@@ -159,7 +162,7 @@ if __name__ == "__main__":
     ax02.hist(pAge,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
     ax02.set_xlabel("Age")
     ax03=fig0.add_subplot(223)
-    ax03.hist(pMetallicity,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
+    ax03.hist(pMetallicitylog,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
     ax03.set_xlabel("Metallicity")
     ax04=fig0.add_subplot(224)
     ax04.plot(Rs,Z)
@@ -210,7 +213,7 @@ if __name__ == "__main__":
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("metallicity")
     fig4=plt.figure(4)
-    plt.scatter(px,pz , c=pStellarMass,cmap = 'gist_earth', s =2, alpha =0.8)
+    plt.scatter(px,pz , c=np.log10(pStellarMass),cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("StellarMass ($M_{\odot}$)")

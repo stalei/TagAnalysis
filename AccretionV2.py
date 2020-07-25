@@ -15,8 +15,8 @@ from matplotlib import cm
 import argparse
 import math
 #import csv
-#How to use: $python AccretionV2.py HDf_tag_file FirstTagged galaxies_file
-#example: python TagAnalysis.py StellarHalo.h5 FirstTagged.h5 gals.ascii
+#How to use: $python AccretionV2.py HDf_tag_file FirstTagged galaxies_file merger_tree
+#example: python TagAnalysis.py StellarHalo.h5 FirstTagged.h5 gals.ascii trees_264_000
 #This works for a single halo/galaxy
 
 if __name__ == "__main__":
@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("TagFile", type=str)
     parser.add_argument("FirstTag", type=str)
     parser.add_argument("GalDirectory", type=str)
+    parser.add_argument("MergerTree", type=str)
     args = parser.parse_args()
     #f=h5.File("StellarHalo.h5","r")
     TagFF=h5.File(args.TagFile,"r")
@@ -169,6 +170,13 @@ if __name__ == "__main__":
         Gx=Gx0[GSnap==ppSnap]
         Gy=Gy0[GSnap==ppSnap]
         Gz=Gz0[GSnap==ppSnap]
+    ##################################################################
+    ###MergerTree
+    #
+    MergerTreeFile=open(args.MergerTree,"r")
+
+    #
+    ##################################################################
     #Any kind of analysis after we extract these points
     Rbins=np.linspace(0,GRv,NBins+1)
     print("Bins:")
@@ -232,6 +240,7 @@ if __name__ == "__main__":
     #
 
     print(GMv,GRv,GRd)
+    print(np.sum(pStellarMass))
     #    #
     #
     fig1 = plt.figure(figsize=plt.figaspect(1))
