@@ -175,6 +175,8 @@ if __name__ == "__main__":
     #min max didn't work so let's find another way to get the total properities
     #checking power law distribution
     #
+    pMetallicitylog=np.log10(pMetallicity[pMetallicity !=0])
+    #pMetallicitylog=pMetallicitylog[pMetallicitylog>-3]
 
     fig0=plt.figure(0)
     ax01=fig0.add_subplot(221)
@@ -185,7 +187,7 @@ if __name__ == "__main__":
     ax02.hist(pAge,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
     ax02.set_xlabel("Age")
     ax03=fig0.add_subplot(223)
-    ax03.hist(pMetallicity,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
+    ax03.hist(pMetallicity,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
     ax03.set_xlabel("Metallicity$(Z/Z_{\\odot})$")
     ax04=fig0.add_subplot(224)
     ax04.plot(Rs,Z)
