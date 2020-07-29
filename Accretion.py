@@ -123,11 +123,13 @@ if __name__ == "__main__":
     px=x[r<GRv]
     py=y[r<GRv]
     pz=z[r<GRv]
+    pr=r[r<GRv]
     pAge=age[r<GRv]
     pStellarMass=StellarMass[r<GRv]
     pMetallicity=metallicity[r<GRv]
     pTreeIndex=TreeIndex[r<GRv]
     #
+    pR=np.sqrt(px**2.+py**2.+pz**2.)*1000.
     UTree2 = set(pTreeIndex)
     pinfallMvir=infallMvir[r<GRv]
     print("TreeIndex2:%d out of %d"%(len(UTree2),len(pTreeIndex)))
@@ -176,6 +178,8 @@ if __name__ == "__main__":
     #checking power law distribution
     #
     pMetallicitylog=np.log10(pMetallicity[pMetallicity !=0])
+    pR=pR[[pMetallicity !=0]]
+    r2=pr[[pMetallicity !=0]]*1000
     #pMetallicitylog=pMetallicitylog[pMetallicitylog>-3]
 
     fig0=plt.figure(0)
@@ -187,10 +191,10 @@ if __name__ == "__main__":
     ax02.hist(pAge,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
     ax02.set_xlabel("Age")
     ax03=fig0.add_subplot(223)
-    ax03.hist(pMetallicity,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
-    ax03.set_xlabel("Metallicity$(Z/Z_{\\odot})$")
+    ax03.hist(pMetallicitylog,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
+    ax03.set_xlabel("Metallicity$(Log(Z/Z_{\\odot}))$")
     ax04=fig0.add_subplot(224)
-    ax04.plot(Rs,Z)
+    ax04.scatter(r2,pMetallicitylog,s=1,c='black')
     #for i in range(0,len(Idh)):
 
     #
