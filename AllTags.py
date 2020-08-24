@@ -15,8 +15,8 @@ from matplotlib import cm
 import argparse
 import math
 #import csv
-#How to use: $python Accretion.py HDf_tag_file halo_catalog galaxy_file
-#example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii gal.csv
+#How to use: $python Accretion.py HDf_tag_file halo_catalog galaxy_file start_snap end_sap
+#example: python TagAnalysis.py StellarHalo.h5 halos_0.0.ascii gal.csv 37 264
 #This works for a single halo/galaxy
 
 if __name__ == "__main__":
@@ -24,6 +24,8 @@ if __name__ == "__main__":
     parser.add_argument("TagFile", type=str)
     parser.add_argument("HaloFile", type=str)
     parser.add_argument("GalFile", type=str)
+    parser.add_argument("Si", type=int)
+    parser.add_argument("Sf", type=int)
     args = parser.parse_args()
     #f=h5.File("StellarHalo.h5","r")
     f=h5.File(args.TagFile,"r")
