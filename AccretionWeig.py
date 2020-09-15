@@ -188,7 +188,7 @@ if __name__ == "__main__":
     ax01.set_xlabel("$log(R(kpc))$")
     ax01.set_ylabel("$log(\\rho) [M_\\odot /kpc^{-3}]$")
     ax02=fig0.add_subplot(222)
-    ax02.hist(pAge,linewidth=2, bins=10,weights=pStellarMass, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
+    ax02.hist(pAge,linewidth=2, bins=10,weights=pStellarMassA, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
     #ax02.hist(pAge,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
     ax02.set_xlabel("Age")
     ax03=fig0.add_subplot(223)

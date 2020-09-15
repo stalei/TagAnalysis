@@ -51,20 +51,24 @@ if __name__ == "__main__":
     datasetNames = [n for n in f.keys()]
     for n in datasetNames:
         print(n)
-    halo=f['FinalTag'] # for full tag
+    #halo=f['FinalTag'] # for full tag
     #halo=f['FirstTagged']
-    #halo=f['FullTag'] # for individual tags
+    halo=f['FullTag'] # for individual tags
     age0=halo['Age']
     StellarMass0=halo['StellarMass']
     metallicity0=halo['ZZ']
-    print(halo.shape)
+    #print(halo.shape)
     x0=halo['X']
     y0=halo['Y']
     z0=halo['Z']
     Mv0=halo['Mvir']
     Hindex0=halo['HaloIndex']
     BE0=halo['BindingEnergy']
-    print(BE0)
+    GalI0=halo['GalIndex']
+    GalNo0=halo['GalNo']
+    Gs=GalI0[(x0<48.8) & (x0>48.7) & (z0<49.7) & (z0>49.65)]
+    #Gs=GalI0[(x0<48.8) & (x0>48.7)]
+    print(Gs)
     ########
     age=age0#[BE0!=0]
     StellarMass=StellarMass0*(1.0e10)#[BE0!=0]*(1.0e10)
@@ -188,7 +192,7 @@ if __name__ == "__main__":
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("StellarMass ($M_{\odot}$)")
     fig5=plt.figure(5)
-    plt.scatter(x,z , c=age,cmap = 'gist_earth', s =2, alpha =0.8)
+    plt.scatter(x,y , c=age,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
     plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
     plt.title("age (Gyr)")
