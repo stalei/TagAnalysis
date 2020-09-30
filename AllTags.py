@@ -133,7 +133,7 @@ if __name__ == "__main__":
         infallMvir0=halo['infallMvir']
         ID0=halo['PID']
         age=age0[BE0!=0]
-        StellarMass=StellarMass0[BE0!=0]*i#*(1.0e10)
+        StellarMass=StellarMass0[BE0!=0]#*i#*(1.0e10)
         metallicity=metallicity0[BE0!=0]/0.0134
         x=x0[BE0!=0]
         y=y0[BE0!=0]
