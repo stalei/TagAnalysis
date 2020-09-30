@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("Sf", type=int)
     args = parser.parse_args()
     #f=h5.File("StellarHalo.h5","r")
-    #Halo
+    #Halos from Rockstar
     halos=np.genfromtxt(args.HaloFile, skip_header=18)
     pnumh=np.array(halos[:,1])
     MvH=np.array(halos[:,2])
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     Rvh=RvH[(MvH>LowerMass) & (MvH<UpperMass)]
     Rvh/=1000 # convert from kpc to Mpc
     #
-    # Galaxy
+    # Galaxies from Sage
     Gals=np.genfromtxt(args.GalFile, delimiter = ',')
     Gx0=np.array(Gals[:,0])
     Gy0=np.array(Gals[:,1])
@@ -114,8 +114,8 @@ if __name__ == "__main__":
         print(tFile)
         f=h5.File(tFile,"r")
         datasetNames = [n for n in f.keys()]
-        for n in datasetNames:
-            print(n)
+        #for n in datasetNames:
+        #    print(n)
         halo=f['FullTag']
         #halo=f['FinalTag'] # for full tag
         #halo=f['FullTag'] # for individual tags
@@ -133,8 +133,8 @@ if __name__ == "__main__":
         infallMvir0=halo['infallMvir']
         ID0=halo['PID']
         age=age0[BE0!=0]
-        StellarMass=StellarMass0[BE0!=0]#*(1.0e10)
-        metallicity=metallicity0[BE0!=0]#/0.0134
+        StellarMass=StellarMass0[BE0!=0]*i#*(1.0e10)
+        metallicity=metallicity0[BE0!=0]/0.0134
         x=x0[BE0!=0]
         y=y0[BE0!=0]
         z=z0[BE0!=0]
@@ -145,10 +145,10 @@ if __name__ == "__main__":
         infallMvir=infallMvir0[BE0!=0]
         ID=ID0[BE0!=0]
         #print("TreeIndex:%d out of %d"%(len(UTree),len(TreeIndex0)))
-        print("ID in snap:")
-        print(ID)
-        print(len(ID))
-        print("Snap:%d-Rv=%g"%(i,GRv))
+        #print("ID in snap:")
+        #print(ID)
+        #print(len(ID))
+        #print("Snap:%d-Rv=%g"%(i,GRv))
         #pxtemp=[0.0]*len(targetID)
         #pytemp=[0.0]*len(targetID)
         #pztemp=[0.0]*len(targetID)
@@ -157,13 +157,14 @@ if __name__ == "__main__":
         #pMetallicitytemp=[0.0]*len(targetID)
         #pTreeIndextemp=[0.0]*len(targetID)
         #rtemp=[0.0]*len(targetID)
-        for i in range(0,len(targetID)):
-            id=targetID[i]
+        for id in targetID:#range(0,len(targetID)):
+            #id=targetID[i]
+            #print(ID[ID==id]==True)
             #for j in range(0,len(ID)):
             #id=targetID[i]
                 #if ID[j]==id:
             if len(ID[ID==id])>0:
-                print("got the id:%d"%id)
+                #print("got the id:%d"%id)
                 #pxtemp[i]=x[ID==id]
                 #pytemp[i]=y[ID==id]
                 #pztemp[i]=z[ID==id]
@@ -202,7 +203,7 @@ if __name__ == "__main__":
     pStellarMass=pStellarMassAll[pxAll !=0]#np.array(pStellarMassAll).ravel()
     pMetallicity=pMetallicityAll[pxAll !=0]#np.array(pMetallicityAll).ravel()
     rAll=rAll[pxAll !=0]#np.array(rAll).ravel()
-    pMetallicitylog=pMetallicity#[pMetallicityFinal !=0]#np.log10(pMetallicityFinal[pMetallicityFinal !=0])
+    pMetallicitylog=np.log10(pMetallicity[pMetallicity !=0])
     dx2=(Gx-px)**2.
     dy2=(Gy-py)**2.
     dz2=(Gz-pz)**2.
@@ -214,21 +215,23 @@ if __name__ == "__main__":
     r2=rAll#pR[pMetallicityFinal !=0]*1000
     #pMetallicitylog=pMetallicitylog[pMetallicitylog>-3]
     if px:
-        fig0=plt.figure(0)
-        ax01=fig0.add_subplot(221)
+        fig0=plt.figure(0,figsize=plt.figaspect(1./3.))
+        #ax01=fig0.add_subplot(221)
         #ax01.plot(np.log10(Rs),np.log10(Rho))
-        ax01.set_xlabel("$log(R(kpc))$")
-        ax01.set_ylabel("$log(\\rho) [M_\\odot /kpc^{-3}]$")
-        ax02=fig0.add_subplot(222)
+        #ax01.set_xlabel("$log(R(kpc))$")
+        #ax01.set_ylabel("$log(\\rho) [M_\\odot /kpc^{-3}]$")
+        ax02=fig0.add_subplot(131)
         ax02.hist(pAge,linewidth=2, bins=10,weights=pStellarMass, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
         #ax02.hist(pAgeAll,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
         ax02.set_xlabel("Age")
-        ax03=fig0.add_subplot(223)
+        ax03=fig0.add_subplot(132)
         ax03.hist(pMetallicitylog,linewidth=2, bins=10,weights=pStellarMass, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
         #ax03.hist(pMetallicitylog,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
         ax03.set_xlabel("Metallicity$(Log(Z/Z_{\\odot}))$")
-        ax04=fig0.add_subplot(224)
+        ax04=fig0.add_subplot(133)
         ax04.scatter(r2,pMetallicitylog,s=1,c='black')
+        ax04.set_xlabel("r")
+        ax04.set_ylabel("Metallicity")
         #for i in range(0,len(Idh)):
         #metalicity-halo mass dependence
         #metalicity of the halo is the average metalicity

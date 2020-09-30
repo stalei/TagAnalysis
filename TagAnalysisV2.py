@@ -55,6 +55,7 @@ if __name__ == "__main__":
     #halo=f['FirstTagged']
     halo=f['FullTag'] # for individual tags
     age0=halo['Age']
+    print(age0)
     StellarMass0=halo['StellarMass']
     metallicity0=halo['ZZ']
     #print(halo.shape)
@@ -66,12 +67,12 @@ if __name__ == "__main__":
     BE0=halo['BindingEnergy']
     GalI0=halo['GalIndex']
     GalNo0=halo['GalNo']
-    Gs=GalI0[(x0<48.8) & (x0>48.7) & (z0<49.7) & (z0>49.65)]
+    #Gs=GalI0[(x0<48.8) & (x0>48.7) & (z0<49.7) & (z0>49.65)]
     #Gs=GalI0[(x0<48.8) & (x0>48.7)]
-    print(Gs)
+    #print(Gs)
     ########
     age=age0#[BE0!=0]
-    StellarMass=StellarMass0*(1.0e10)#[BE0!=0]*(1.0e10)
+    StellarMass=StellarMass0#*(1.0e10)#[BE0!=0]*(1.0e10)
     metallicity=metallicity0#[BE0!=0]
     x=x0#[BE0!=0]
     y=y0#[BE0!=0]
