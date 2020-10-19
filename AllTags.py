@@ -66,7 +66,7 @@ if __name__ == "__main__":
     Gy=Gy0[(GMv0>LowerMass) & (GMv0<UpperMass)]#44.62#
     Gz=Gz0[(GMv0>LowerMass) & (GMv0<UpperMass)]#49.6777#
     GMv=GMv0[(GMv0>LowerMass) & (GMv0<UpperMass)]
-    GRv=GRv0[(GMv0>LowerMass) & (GMv0<UpperMass)]#*2#*10000
+    GRv=GRv0[(GMv0>LowerMass) & (GMv0<UpperMass)]#*10000#*10000
     GRd=GRd0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     GSM=GSM0[(GMv0>LowerMass) & (GMv0<UpperMass)]
     print("Galaxy:%g-%g-%g"%(Gx,Gy,Gz))
@@ -100,13 +100,15 @@ if __name__ == "__main__":
     L=len(targetID)
     print(L)
     S=args.Sf-args.Si
-    pxAll=[0.0]*L*S
-    pyAll=[0.0]*L*S
-    pzAll=[0.0]*L*S
-    pAgeAll=[0.0]*L*S
-    pStellarMassAll=[0.0]*L*S
-    pMetallicityAll=[0.0]*L*S
-    rAll=[0.0]*L*S
+    Size=L*S
+    pxAll=np.zeros(Size)#[0.0]*Size
+    pyAll=np.zeros(Size)#[0.0]*Size
+    pzAll=np.zeros(Size)#[0.0]*Size
+    pAgeAll=np.zeros(Size)#[0.0]*Size
+    pStellarMassAll=np.zeros(Size)#[0.0]*Size
+    pMetallicityAll=np.zeros(Size)#[0.0]*Size
+    rAll=np.zeros(Size)#[0.0]*Size
+    snapAll=np.zeros(Size)#[0.0]*Size
     t=0
     for i in range(args.Sf,args.Si,-1):
         num="/tag_%03d.h5"%i
@@ -132,6 +134,7 @@ if __name__ == "__main__":
         TreeIndex0=halo['TreeIndex']
         infallMvir0=halo['infallMvir']
         ID0=halo['PID']
+        Snap0=halo['Snap']
         age=age0[BE0!=0]
         StellarMass=StellarMass0[BE0!=0]#*i#*(1.0e10)
         metallicity=metallicity0[BE0!=0]/0.0134
@@ -144,6 +147,7 @@ if __name__ == "__main__":
         #UTree = set(TreeIndex)
         infallMvir=infallMvir0[BE0!=0]
         ID=ID0[BE0!=0]
+        Snap=Snap0[BE0!=0]
         #print("TreeIndex:%d out of %d"%(len(UTree),len(TreeIndex0)))
         #print("ID in snap:")
         #print(ID)
@@ -157,9 +161,12 @@ if __name__ == "__main__":
         #pMetallicitytemp=[0.0]*len(targetID)
         #pTreeIndextemp=[0.0]*len(targetID)
         #rtemp=[0.0]*len(targetID)
+        print("len Target/ID:")
+        print(len(targetID))
+        print(len(ID))
         for id in targetID:#range(0,len(targetID)):
             #id=targetID[i]
-            #print(ID[ID==id]==True)
+            #print(ID[ID==id])
             #for j in range(0,len(ID)):
             #id=targetID[i]
                 #if ID[j]==id:
@@ -172,15 +179,24 @@ if __name__ == "__main__":
                 #pStellarMasstemp[i]=StellarMass[ID==id]
                 #pMetallicitytemp[i]=metallicity[ID==id]
                 #pTreeIndextemp[i]=TreeIndex[ID==id]
+                #print("Stellar mass:")
+                #print(StellarMass[ID==id])
                 pxAll[t]=x[ID==id]
                 pyAll[t]=y[ID==id]
                 pzAll[t]=z[ID==id]
                 pAgeAll[t]=age[ID==id]
                 pStellarMassAll[t]=StellarMass[ID==id]
                 pMetallicityAll[t]=metallicity[ID==id]
+                snapAll[t]=Snap[ID==id]
+                print("in loop:")
+                print(t)
+                print(StellarMass[ID==id])
                 t+=1
+        print("t:%d"%t)
         #now we have those particles in either cases
         #px=pxtemp[pxtemp!=0]
+        #if t>1000000:
+        #    print("got 10^6")
         #py=pytemp[pxtemp!=0]
         #pz=pztemp[pxtemp!=0]
         #pAge=pAgetemp[pxtemp!=0]
@@ -196,37 +212,41 @@ if __name__ == "__main__":
         #rAll.append(r)
         #now prepare to plot
     # now this is a (sf-si)*N array and we have to flatten them to 1D arrays.
-    px=pxAll[pxAll !=0]#np.array(pxAll).ravel()
-    py=pyAll[pxAll !=0]#np.array(pyAll).ravel()
-    pz=pzAll[pxAll !=0]#np.array(pzAll).ravel()
-    pAge=pAgeAll[pxAll !=0]#np.array(pAgeAll).ravel()
-    pStellarMass=pStellarMassAll[pxAll !=0]#np.array(pStellarMassAll).ravel()
-    pMetallicity=pMetallicityAll[pxAll !=0]#np.array(pMetallicityAll).ravel()
-    rAll=rAll[pxAll !=0]#np.array(rAll).ravel()
+    print(pxAll[pStellarMassAll != 0])
+    #hint hx = hx.astype(np.float64)
+    px=pxAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(pxAll).ravel()
+    py=pyAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(pyAll).ravel()
+    pz=pzAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(pzAll).ravel()
+    pAge=pAgeAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(pAgeAll).ravel()
+    pStellarMass=pStellarMassAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(pStellarMassAll).ravel()
+    pMetallicity=pMetallicityAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(pMetallicityAll).ravel()
+    rAll=rAll.astype(np.float64)#.flatten()#[pStellarMassAll !=0]#np.array(rAll).ravel()
+    pSnap=snapAll.astype(np.float64)#[pStellarMassAll !=0]
+    print("The Len after clean-up:%d"%len(px[pStellarMassAll != 0]))
     pMetallicitylog=np.log10(pMetallicity[pMetallicity !=0])
     dx2=(Gx-px)**2.
     dy2=(Gy-py)**2.
     dz2=(Gz-pz)**2.
-    rALl=np.sqrt(dx2+dy2+dz2)
+    #rALl=np.sqrt(dx2+dy2+dz2)
     #print(pMetallicityFinal)
     #rsquared=(Gx-pxAll)**2.+(Gy-pyAll)**2.+(Gz-pzAll)**2.
     #pR=rAllFinal#np.sqrt(np.array(rsquared))*1000.
     #pR=pR[pMetallicityAll !=0]
-    r2=rAll#pR[pMetallicityFinal !=0]*1000
+    r2=rAll[pMetallicity !=0]*1000
     #pMetallicitylog=pMetallicitylog[pMetallicitylog>-3]
-    if px:
+    if len(px)>0:
         fig0=plt.figure(0,figsize=plt.figaspect(1./3.))
         #ax01=fig0.add_subplot(221)
         #ax01.plot(np.log10(Rs),np.log10(Rho))
         #ax01.set_xlabel("$log(R(kpc))$")
         #ax01.set_ylabel("$log(\\rho) [M_\\odot /kpc^{-3}]$")
         ax02=fig0.add_subplot(131)
-        ax02.hist(pAge,linewidth=2, bins=10,weights=pStellarMass, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
-        #ax02.hist(pAgeAll,linewidth=2, bins=10, log=False,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
+        #ax02.hist(pAge,linewidth=2, bins=10,weights=pStellarMass, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
+        ax02.hist(pAge,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
         ax02.set_xlabel("Age")
         ax03=fig0.add_subplot(132)
-        ax03.hist(pMetallicitylog,linewidth=2, bins=10,weights=pStellarMass, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
-        #ax03.hist(pMetallicitylog,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
+        #ax03.hist(pMetallicitylog,linewidth=2, bins=10,weights=pStellarMass, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
+        ax03.hist(pMetallicitylog,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='metallicity')
         ax03.set_xlabel("Metallicity$(Log(Z/Z_{\\odot}))$")
         ax04=fig0.add_subplot(133)
         ax04.scatter(r2,pMetallicitylog,s=1,c='black')
@@ -235,6 +255,9 @@ if __name__ == "__main__":
         #for i in range(0,len(Idh)):
         #metalicity-halo mass dependence
         #metalicity of the halo is the average metalicity
+        #fig1=plt.figure(1)
+        #ax1=fig1.add_subplot(111)
+        #ax1.hist(pSnap,linewidth=2, bins=10, log=True,cumulative=False, histtype='step', alpha=0.9,color='blue',label='age')
         print(GMv,GRv,GRd,GSM)
         print(np.sum(pStellarMass))
         plt.show()

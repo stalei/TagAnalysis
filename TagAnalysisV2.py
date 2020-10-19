@@ -195,10 +195,13 @@ if __name__ == "__main__":
     fig5=plt.figure(5)
     plt.scatter(x,y , c=age,cmap = 'gist_earth', s =2, alpha =0.8)
     cbar = plt.colorbar()
-    plt.scatter(Gx,Gz,c='r',marker='+',alpha=0.4)
+    plt.scatter(Gx,Gy,c='r',marker='+',alpha=0.4)
     plt.title("age (Gyr)")
     #Halo plots
     #
+    print("Galaxy pos(Gal/Rockstar):")
+    print(Gx,Gy,Gz)
+    print(xh,yh,zh)
 
 
     plt.show()
