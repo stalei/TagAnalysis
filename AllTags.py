@@ -188,6 +188,7 @@ if __name__ == "__main__":
                 pStellarMassAll[t]=StellarMass[ID==id]
                 pMetallicityAll[t]=metallicity[ID==id]
                 snapAll[t]=Snap[ID==id]
+                rAll[t]=np.sqrt((pxAll[t]-Gx)**2.+(pyAll[t]-Gy)**2.+(pzAll[t]-Gz)**2.)
                 print("in loop:")
                 print(t)
                 print(StellarMass[ID==id])
@@ -232,7 +233,7 @@ if __name__ == "__main__":
     #rsquared=(Gx-pxAll)**2.+(Gy-pyAll)**2.+(Gz-pzAll)**2.
     #pR=rAllFinal#np.sqrt(np.array(rsquared))*1000.
     #pR=pR[pMetallicityAll !=0]
-    r2=rAll[pMetallicity !=0]*1000
+    r2=rAll[pMetallicity !=0]#*1000
     #pMetallicitylog=pMetallicitylog[pMetallicitylog>-3]
     if len(px)>0:
         fig0=plt.figure(0,figsize=plt.figaspect(1./3.))
