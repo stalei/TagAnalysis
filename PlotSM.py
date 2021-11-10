@@ -25,7 +25,7 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
     #address='/media/shahram/JB3/2021/AllTags/AllTags_170.h5'
     #AllTags_264.h5
-    address='/media/shahram/JB3/2021/AllTagsPosFixed/*.h5'
+    address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
     gx=29.3575
     gy=31.0276
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             #print(float(Vx0[ID0==313488]))
             #if(len(ID0[ID0==313488])>0):
             #    print("yay!")
-    plt.scatter(xT,zT , c=np.log10(SMT),cmap = 'YlGn', s =2, alpha =0.8)
+    plt.scatter(xT,zT , c=np.log10(SMT),cmap = 'gist_earth', s =2, alpha =0.8) ## gist_earth YlGn
     #np.log10(StellarMass)
     cbar = plt.colorbar()
     plt.clim(0.2, 7.5)

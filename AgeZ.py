@@ -32,6 +32,8 @@ if __name__ == "__main__":
     gz=32.4926
     Rv=0.139977
     fig1= plt.figure(1)
+    SMT=[]
+    MetallicityT=[]
     ageT=[]
     xT=[]
     zT=[]
@@ -97,16 +99,19 @@ if __name__ == "__main__":
             xT.extend(x)
             zT.extend(z)
             ageT.extend(age)
+            MetallicityT.extend(Metallicity)
+            SMT.extend(StellarMass)
             #print(ID0)
             #print(float(Vx0[ID0==313488]))
             #if(len(ID0[ID0==313488])>0):
             #    print("yay!")
-    plt.scatter(xT,zT , c=ageT,cmap = 'gist_earth', s =1, alpha =0.3) # gist_earth YlGn
-    cbar = plt.colorbar()
-    cbar.set_label('Age (Gyr)')
-    plt.scatter(gx,gz,c='r',marker='+',alpha=0.5)
-    plt.title("Age")
-    plt.xlabel('x (Mpc)')
-    plt.ylabel('z (Mpc)')
+    #plt.scatter(ageT,MetallicityT , c=SMT,cmap = 'YlGn', s =1, alpha =0.2)
+    plt.scatter(ageT,np.log10(MetallicityT) , s =1, alpha =0.9)
+    #cbar = plt.colorbar()
+    #cbar.set_label('Age (Gyr)')
+    #plt.scatter(gx,gz,c='r',marker='+',alpha=0.4)
+    plt.title("Age Metallicity")
+    plt.xlabel('Age')
+    plt.ylabel('Metallicity')
     #plt.savefig('Age.png')
     plt.show()

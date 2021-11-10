@@ -25,7 +25,7 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
     #address='/media/shahram/JB3/2021/AllTags/AllTags_262.h5'
     #AllTags_264.h5
-    address='/media/shahram/JB3/2021/AllTagsPosFixed/*.h5'
+    address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
     gx=29.3575
     gy=31.0276
@@ -101,8 +101,8 @@ if __name__ == "__main__":
             #print(float(Vx0[ID0==313488]))
             #if(len(ID0[ID0==313488])>0):
             #    print("yay!")
-    plt.scatter(xT,zT , c=np.log10(MetallicityT),cmap = 'YlGn', s =2, alpha =0.8)
-    #cmap = 'gist_earth'    'viridis'  gnuplot
+    plt.scatter(xT,zT , c=np.log10(MetallicityT),cmap = 'gist_earth', s =2, alpha =0.8)
+    #cmap = 'gist_earth'    'viridis'  gnuplot   YlGn
     cbar = plt.colorbar()
     plt.clim(-7, -2)
     cbar.set_label('Metallicity')
@@ -111,4 +111,6 @@ if __name__ == "__main__":
     plt.xlabel('x (Mpc)')
     plt.ylabel('z (Mpc)')
     #plt.savefig('Metallicity.png')
+    #plt.hist(np.log10(MetallicityT),linewidth=2, bins=100, log=False,cumulative=-1, histtype='step', alpha=0.9,color='blue',label='DMO')
+    #plt.hist(np.log10(MetallicityT[MetallicityT!=0]),linewidth=2, bins=100, log=False, histtype='step', alpha=0.9,color='blue',label='Z')
     plt.show()
