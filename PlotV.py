@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
     #address='/media/shahram/JB3/2021/AllTags/AllTags_262.h5'
     #AllTags_264.h5
-    address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
+    address='/media/shahram/JB3/2021/AllTagsPosFixed/test/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
     gx=29.3575
     gy=31.0276
@@ -51,6 +51,7 @@ if __name__ == "__main__":
     VzT=[]
     rT=[]
     xT=[]
+    yT=[]
     zT=[]
     SMT=[]
     for h5name in glob.glob(address):
@@ -117,10 +118,14 @@ if __name__ == "__main__":
             Vx-=VxH
             Vy-=VyH
             Vz-=VzH
+            x-=gx
+            y-=gy
+            z-=gz
             rr=r[r<Rv]
             f.close()
             print("finished finding particles in Rv")
             xT.extend(x)
+            yT.extend(y)
             zT.extend(z)
             rT.extend(rr)
             VxT.extend(Vx)
@@ -148,9 +153,19 @@ if __name__ == "__main__":
     Density=[0.]*NBins
     Vc=[0.]*NBins
     MIn=[0.]*NBins
+    Vr2Mean=[0.]*NBins
+    Vfi2Mean=[0.]*NBins
+    Vtheta2Mean=[0.]*NBins
+    beta=[0.]*NBins
+    vr=[0.]*NBins
+    vt=[0.]*NBins
+    vf=[0.]*NBins
     #for i in range(0,NBins):
     #    Rs[i]=(Rbins[i]+Rbins[i+1])/2.
     rT=np.array(rT)
+    xT=np.array(xT)
+    yT=np.array(yT)
+    zT=np.array(zT)
     VxT=np.array(VxT)
     VyT=np.array(VyT)
     VzT=np.array(VzT)
@@ -160,6 +175,10 @@ if __name__ == "__main__":
         Rin=rBins[i]
         Rout=rBins[i+1]
         Rs[i]=(rBins[i]+rBins[i+1])/2.
+        xBin=xT[(rT>Rin) & (rT<Rout)]
+        yBin=yT[(rT>Rin) & (rT<Rout)]
+        zBin=zT[(rT>Rin) & (rT<Rout)]
+        rBin=rT[(rT>Rin) & (rT<Rout)]
         VxBin=VxT[(rT>Rin) & (rT<Rout)]
         VyBin=VyT[(rT>Rin) & (rT<Rout)]
         VzBin=VzT[(rT>Rin) & (rT<Rout)]
@@ -180,40 +199,67 @@ if __name__ == "__main__":
         #print("SM:%g"%np.nansum(SMBin,dtype=np.float64))
         Vbin=(VxBin**2.+VyBin**2.+VzBin**2.)**0.5
         #SigmaV[i]=np.std(Vbin)
-        tethaBin=np.arctan2(VyBin,VxBin)
-        fiBin=np.arccos(VzBin/Vbin)
-        VrBin=VxBin*np.sin(fiBin)*np.cos(tethaBin)+VyBin*np.sin(fiBin)*np.sin(tethaBin)+VzBin*np.cos(fiBin)
-        VtethaBin=VxBin*(-np.sin(tethaBin))+VyBin*np.cos(tethaBin)
-        VfiBin=VxBin*np.cos(fiBin)*np.cos(tethaBin)+VyBin*np.cos(fiBin)*np.sin(tethaBin)-VzBin*np.sin(fiBin)
-        Vcirc=np.sqrt(VtethaBin**2.+VfiBin**2.)
+        #1st calc
+        # thetaBin=np.arctan2(VyBin,VxBin)
+        # fiBin=np.arccos(VzBin/Vbin)
+        # VrBin=VxBin*np.sin(fiBin)*np.cos(thetaBin)+VyBin*np.sin(fiBin)*np.sin(thetaBin)+VzBin*np.cos(fiBin)
+        # VthetaBin=VxBin*(-np.sin(thetaBin))+VyBin*np.cos(thetaBin)
+        # VfiBin=VxBin*np.cos(fiBin)*np.cos(thetaBin)+VyBin*np.cos(fiBin)*np.sin(thetaBin)-VzBin*np.sin(fiBin)
+        #2nd calc
+        fiBin=np.arctan2(yBin,xBin)
+        thetaBin=np.arccos(zBin/rBin)
+        VrBin=VxBin*np.cos(fiBin)*np.sin(thetaBin)+VyBin*np.sin(fiBin)*np.sin(thetaBin)+VzBin*np.cos(thetaBin)
+        VthetaBin=VxBin*np.cos(fiBin)*np.cos(thetaBin)+VyBin*np.sin(fiBin)*np.cos(thetaBin)-VzBin*np.sin(thetaBin)
+        VfiBin=VxBin*(-np.sin(fiBin))+VyBin*np.cos(fiBin)
+        vr[i]=statistics.mean(VrBin)
+        vt[i]=statistics.mean(VthetaBin)
+        vf[i]=statistics.mean(VfiBin)
+        #
+        Vcirc=np.sqrt(VthetaBin**2.+VfiBin**2.)
         SigmaV[i]=np.std(VrBin)
+        Vr2Mean[i]=statistics.mean(VrBin**2.)
+        Vfi2Mean[i]=statistics.mean(VfiBin**2.)
+        Vtheta2Mean[i]=statistics.mean(VthetaBin**2.)
+        beta[i]=1-(Vtheta2Mean[i]+Vfi2Mean[i])/(2.*Vr2Mean[i])
+        #beta[i]/=2.
         #massBin=np.nansum(SMBin)
         Density[i]=np.sum(rho)#massBin/dV
         Vc[i]=statistics.mean(Vcirc)
     #Now fitting V_sigma
     #
     SigmaVFit = UnivariateSpline(Rs, SigmaV)
+    Vr2MeanFit= UnivariateSpline(Rs, Vr2Mean)
+    DensityFit = UnivariateSpline(Rs, Density,s=2)
     #
     #Now Jeans modeling
-    M_enclosed=[0.]*NBins
+    M_enclosed0=[0.]*NBins
+    M_enclosedbeta=[0.]*NBins
     r=[0.]*NBins
     for i in range(0,NBins-1):
         #Dsigma=SigmaV[i+1]-SigmaV[i]
-        Dsigma=Density[i+1]*SigmaVFit(Rs[i+1])-Density[i]*SigmaVFit(Rs[i])
-        DR=Rs[i+1]-Rs[i]
-        DR/=Density[i+1]
+        #Dsigma=DensityFit(Rs[i+1])*SigmaVFit(Rs[i+1])-DensityFit(Rs[i])*SigmaVFit(Rs[i])
+        #Dsigma=DensityFit(Rs[i+1])*Vr2MeanFit(Rs[i+1])-DensityFit(Rs[i])*Vr2MeanFit(Rs[i])
+        #DR=Rs[i+1]-Rs[i]
+        #DR/=DensityFit(Rs[i+1])
         r[i]=(Rs[i+1]+Rs[i])/2.
-        M_enclosed[i]=np.abs((Dsigma/DR)*(r[i]**2.)/G)
+        dLnr=np.log(Rs[i+1])-np.log(Rs[i])
+        dLnVr2=np.log(Vr2MeanFit(Rs[i+1]))-np.log(Vr2MeanFit(Rs[i]))
+        dLnRho=np.log(DensityFit(Rs[i+1]))-np.log(DensityFit(Rs[i]))
+        #M_enclosed[i]=np.abs((Dsigma/DR)*(r[i]**2.)/G)
+        M_enclosed0[i]=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr))*(r[i]*Vr2MeanFit(Rs[i+1]))/G)
+        M_enclosedbeta[i]=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr)+2*beta[i+1])*(r[i]*Vr2MeanFit(Rs[i+1]))/G)
     #plt.scatter(xT,zT , c=ageT,cmap = 'gist_earth', s =1, alpha =0.3) # gist_earth YlGn
-    plt.plot(Rs,SigmaV, c='grey')
-    plt.plot(Rs,SigmaVFit(Rs),c='black')
+    plt.plot(Rs,SigmaV, c='grey', linestyle=':',label='Data')
+    plt.plot(Rs,SigmaVFit(Rs),c='black',label='Fit')
     plt.title("$\\sigma_v $")
     plt.xlabel('d ($Mpc h^{-1}$)')
     plt.ylabel('$\\sigma_v (Km s^{-1})$')
+    plt.legend()
     print(Density)
     #plt.savefig('Age.png')
     fig3= plt.figure(3)
-    plt.plot(Rs,np.log10(Density), c='black')
+    plt.plot(Rs,np.log10(Density), c='grey', linestyle=':',label='Data')
+    plt.plot(Rs,np.log10(DensityFit(Rs)), c='black',label='Fit')
     #plt.scatter(rT,VzT, s =1,c='black', alpha =0.5) # gist_earth YlGn
     #cbar = plt.colorbar()
     #cbar.set_label('Age (Gyr)')
@@ -221,6 +267,7 @@ if __name__ == "__main__":
     plt.title("$ Log(\\rho) -R$")
     plt.xlabel('d ($Mpc h^{-1}$)')
     plt.ylabel("$ \\rho $")
+    plt.legend()
     #Vc
     fig4= plt.figure(4)
     plt.plot(Rs,Vc, c='black')
@@ -233,12 +280,33 @@ if __name__ == "__main__":
     plt.ylabel("$ V_c $")
     #mass profile
     fig5= plt.figure(5)
-    plt.plot(r,np.log10(M_enclosed), c='black', label='Jeans')
+    plt.plot(r,np.log10(M_enclosed0), c='black',linestyle='--', label='Jeans, $\\beta =0$')
+    plt.plot(r,np.log10(M_enclosedbeta), c='black', label='Jeans, $\\beta$')
     plt.plot(RSnap,np.log10(massSnap), c='grey',linestyle=':',label='DM halo')
     plt.plot(Rs,np.log10(MIn), c='grey',linestyle='-.',label='SM')
     plt.title("$M_{enclosed}$")
     plt.xlabel('d ($Mpc h^{-1}$)')
     plt.ylabel("$Log(M_{enclosed})$")
+    plt.legend()
+    #
+    fig6= plt.figure(6)
+    plt.plot(Rs,beta, c='black', label='$\\beta$')
+    #plt.plot(RSnap,np.log10(massSnap), c='grey',linestyle=':',label='DM halo')
+    #plt.plot(Rs,np.log10(MIn), c='grey',linestyle='-.',label='SM')
+    plt.title("$\\beta$")
+    plt.xlabel('d ($Mpc h^{-1}$)')
+    plt.ylabel("$\\beta$")
+    plt.legend()
+    #
+    fig7= plt.figure(7)
+    plt.plot(Rs,vr, c='black', linestyle='-', label='$V_r$')
+    plt.plot(Rs,vt, c='black', linestyle='-.',label='$V_{\\theta}$')
+    plt.plot(Rs,vf, c='black',linestyle='--', label='$V_{\\phi}$')
+    #plt.plot(RSnap,np.log10(massSnap), c='grey',linestyle=':',label='DM halo')
+    #plt.plot(Rs,np.log10(MIn), c='grey',linestyle='-.',label='SM')
+    plt.title("$V$")
+    plt.xlabel('d ($Mpc h^{-1}$)')
+    plt.ylabel("$V$")
     plt.legend()
     #
     plt.show()
