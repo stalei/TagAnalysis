@@ -22,6 +22,7 @@ from scipy.constants import G
 from scipy.optimize import curve_fit
 plt.rcParams["font.size"] =13
 from scipy.interpolate import UnivariateSpline
+import math
 
 #m12i
 massSnap=[5543750000.0, 20971750000.0, 40641500000.0, 61843000000.0, 83163500000.0, 104176750000.0, 125208500000.0, 146756500000.0, 168737000000.0, 190738750000.0, 212401250000.0, 233703750000.0, 254553750000.0, 275254000000.0, 295184250000.0, 314619250000.0, 334300000000.0, 353782250000.0, 372899250000.0, 391263000000.0, 409546250000.0, 427567750000.0, 445733000000.0, 463717000000.0, 481010250000.0, 497740750000.0, 513780250000.0, 529309250000.0, 544975000000.0, 560099500000.0, 574898750000.0, 588946250000.0, 602522000000.0, 615285250000.0, 627393500000.0, 639123750000.0, 650461250000.0, 661348250000.0, 671958250000.0]
@@ -35,7 +36,8 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
     #address='/media/shahram/JB3/2021/AllTags/AllTags_262.h5'
     #AllTags_264.h5
-    address='/media/shahram/JB3/2021/AllTagsPosFixed/test/*.h5'
+    #address='/media/shahram/JB3/2021/AllTagsPosFixed/test/*.h5'
+    address='/media/shahram/ShahramWD1/AllTagsPosFixed/rem/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
     gx=29.3575
     gy=31.0276
@@ -55,7 +57,7 @@ if __name__ == "__main__":
     zT=[]
     SMT=[]
     for h5name in glob.glob(address):
-        print(h5name)
+        #print(h5name)
         with h5.File(h5name, "r") as f:
             # List all groups
             print("Keys: %s" % f.keys())
@@ -63,45 +65,46 @@ if __name__ == "__main__":
             print("Read keys")
             a_group_key = f_key[0]
             age0 =np.array(f[a_group_key])
-            print("0")
+            #print("0")
             a_group_key = f_key[1]
             GID0 = np.array(f[a_group_key])
-            print("1")
+            #print("1")
             a_group_key = f_key[2]
             HID0 = np.array(f[a_group_key])
-            print("2")
+            #print("2")
             a_group_key = f_key[3]
             ID0 =np.array(f[a_group_key])
-            print("3")
+            #print("3")
             a_group_key = f_key[4]
             Metallicity0=np.array(f[a_group_key])
-            print("4")
+            #print("4")
             a_group_key = f_key[5]
             StellarMass0 =np.array(f[a_group_key])
-            print("5")
+            #print("5")
             a_group_key = f_key[6]
             Vx0 =np.array(f[a_group_key])
-            print("6")
+            #print("6")
             a_group_key = f_key[7]
             Vy0 =np.array(f[a_group_key])
-            print("7")
+            #print("7")
             a_group_key = f_key[8]
             Vz0=np.array(f[a_group_key])
-            print("8")
+            #print("8")
             a_group_key = f_key[9]
             x0 =np.array(f[a_group_key])
-            print("9")
+            #print("9")
             a_group_key = f_key[10]
             y0 =np.array(f[a_group_key])
-            print("10")
+            #print("10")
             a_group_key = f_key[11]
             z0 =np.array(f[a_group_key])
-            print("11")
-            print("finished reading")
+            #print("11")
+            #print(z0[z0 !=0])
+            #print("finished reading%s"%h5name)
             dx=x0-gx
             dy=y0-gy
             dz=z0-gz
-            r=(dx*dx+dy*dy+dz*dz)**0.5
+            r=np.sqrt(dx*dx+dy*dy+dz*dz)#**0.5
             print("separation is done")
             print("len age=%d, len r=%d"%(len(age0),len(r)))
             print(r<Rv)
@@ -160,6 +163,9 @@ if __name__ == "__main__":
     vr=[0.]*NBins
     vt=[0.]*NBins
     vf=[0.]*NBins
+    Sigvr=[0.]*NBins
+    Sigvt=[0.]*NBins
+    Sigvf=[0.]*NBins
     #for i in range(0,NBins):
     #    Rs[i]=(Rbins[i]+Rbins[i+1])/2.
     rT=np.array(rT)
@@ -171,6 +177,8 @@ if __name__ == "__main__":
     VzT=np.array(VzT)
     SMT=np.array(SMT)
     mm=0.
+    VrAll=[]
+    Rss=[]
     for i in range(0,NBins):
         Rin=rBins[i]
         Rout=rBins[i+1]
@@ -214,27 +222,51 @@ if __name__ == "__main__":
         vr[i]=statistics.mean(VrBin)
         vt[i]=statistics.mean(VthetaBin)
         vf[i]=statistics.mean(VfiBin)
+        Sigvr[i]=np.std(VrBin)
+        Sigvt[i]=np.std(VthetaBin)
+        Sigvf[i]=np.std(VfiBin)
         #
-        Vcirc=np.sqrt(VthetaBin**2.+VfiBin**2.)
+        #Vcirc=np.sqrt(VthetaBin**2.+VfiBin**2.)
+        Vcirc=np.sqrt(vt[i]**2.+vf[i]**2.)
         SigmaV[i]=np.std(VrBin)
         Vr2Mean[i]=statistics.mean(VrBin**2.)
         Vfi2Mean[i]=statistics.mean(VfiBin**2.)
         Vtheta2Mean[i]=statistics.mean(VthetaBin**2.)
         beta[i]=1-(Vtheta2Mean[i]+Vfi2Mean[i])/(2.*Vr2Mean[i])
+        VrAll.extend(VrBin)
+        #rss=np.sqrt(xBin**2.+yBin**2.+zBin**2.)
+        #print(rBin)
+        Rss.extend(rBin)
         #beta[i]/=2.
         #massBin=np.nansum(SMBin)
         Density[i]=np.sum(rho)#massBin/dV
-        Vc[i]=statistics.mean(Vcirc)
+        Vc[i]=Vcirc#statistics.mean(Vcirc)
     #Now fitting V_sigma
     #
     SigmaVFit = UnivariateSpline(Rs, SigmaV)
     Vr2MeanFit= UnivariateSpline(Rs, Vr2Mean)
     DensityFit = UnivariateSpline(Rs, Density,s=2)
+    # Log fit
+    SigmaVFit2 = UnivariateSpline(Rs, SigmaV)# np.log(SigmaV))
+    Vr2MeanFit20=UnivariateSpline(Rs,np.log10(Vr2Mean))
+    Vr2MeanFit2=10.**(Vr2MeanFit20(Rs))
+    DensityFit20 = UnivariateSpline(Rs, np.log10(Density),s=2)
+    DensityFit2=10.**(DensityFit20(Rs))
+    #
+    Rss=np.array(Rss)
+    VrAll=np.array(VrAll)
     #
     #Now Jeans modeling
     M_enclosed0=[0.]*NBins
     M_enclosedbeta=[0.]*NBins
     r=[0.]*NBins
+    M_enclosed02=[0.]*NBins
+    M_enclosedbeta2=[0.]*NBins
+    dLnr2=np.gradient(Rs)
+    print(dLnr2)
+    dLnVr22=np.gradient(Vr2MeanFit2)
+    print(dLnVr22)
+    dLnRho2=np.gradient(DensityFit2)
     for i in range(0,NBins-1):
         #Dsigma=SigmaV[i+1]-SigmaV[i]
         #Dsigma=DensityFit(Rs[i+1])*SigmaVFit(Rs[i+1])-DensityFit(Rs[i])*SigmaVFit(Rs[i])
@@ -247,10 +279,24 @@ if __name__ == "__main__":
         dLnRho=np.log(DensityFit(Rs[i+1]))-np.log(DensityFit(Rs[i]))
         #M_enclosed[i]=np.abs((Dsigma/DR)*(r[i]**2.)/G)
         M_enclosed0[i]=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr))*(r[i]*Vr2MeanFit(Rs[i+1]))/G)
+        M_enclosed0[i]*=0.7
         M_enclosedbeta[i]=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr)+2*beta[i+1])*(r[i]*Vr2MeanFit(Rs[i+1]))/G)
+        M_enclosedbeta[i]*=0.7
+        print(i)
+        M_enclosed02[i]=np.abs(((dLnRho2[i]/dLnr2[i])+(dLnVr22[i]/dLnr2[i]))*(Rs[i]*Vr2MeanFit(Rs[i]))/G)
+        M_enclosedbeta2[i]=np.abs(((dLnRho2[i]/dLnr2[i])+(dLnVr22[i]/dLnr2[i])+2*beta[i])*(Rs[i]*Vr2MeanFit(Rs[i]))/G)#np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr)+2*beta[i+1])*(r[i]*Vr2MeanFit(Rs[i+1]))/G)
+    # dLnr2=np.gradient(Rs)
+    # dLnVr22=np.gradient(Vr2MeanFit2)
+    # dLnRho2=np.gradient(DensityFit2)
+    #M_enclosed02=np.abs(((dLnRho2/dLnr2)+(dLnVr22/dLnr2))*(Rs*Vr2MeanFit2(Rs))/G)#UnivariateSpline(Rs,np.abs(((dLnRho2/dLnr2)+(dLnVr22/dLnr2))*(Rs*Vr2MeanFit2(Rs))/G))
+    #M_enclosedbeta2=np.abs(((dLnRho2/dLnr2)+(dLnVr22/dLnr2)+2*beta)*(Rs*Vr2MeanFit2(Rs))/G)#UnivariateSpline(Rs,np.abs(((dLnRho2/dLnr2)+(dLnVr22/dLnr2)+2*beta)*(Rs*Vr2MeanFit2(Rs))/G))
+    #M_enclosedbeta2=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr)+2*beta[i+1])*(r[i]*Vr2MeanFit(Rs[i+1]))/G)
     #plt.scatter(xT,zT , c=ageT,cmap = 'gist_earth', s =1, alpha =0.3) # gist_earth YlGn
+    M_enclosed0Fit = UnivariateSpline(Rs, M_enclosed0)
+    M_enclosedbetaFit=UnivariateSpline(Rs, M_enclosedbeta)
     plt.plot(Rs,SigmaV, c='grey', linestyle=':',label='Data')
     plt.plot(Rs,SigmaVFit(Rs),c='black',label='Fit')
+    plt.plot(Rs,SigmaVFit2(Rs),c='black',linestyle='-.',label='Fit2')
     plt.title("$\\sigma_v $")
     plt.xlabel('d ($Mpc h^{-1}$)')
     plt.ylabel('$\\sigma_v (Km s^{-1})$')
@@ -258,15 +304,16 @@ if __name__ == "__main__":
     print(Density)
     #plt.savefig('Age.png')
     fig3= plt.figure(3)
-    plt.plot(Rs,np.log10(Density), c='grey', linestyle=':',label='Data')
-    plt.plot(Rs,np.log10(DensityFit(Rs)), c='black',label='Fit')
+    plt.plot(np.log10(Rs),np.log10(Density), c='grey', linestyle=':',label='Data')
+    plt.plot(np.log10(Rs),np.log10(DensityFit(Rs)), c='black',linestyle='-.',label='Fit')
+    #plt.plot(Rs,np.log10(np.exp(DensityFit2(Rs))), c='black',linestyle='-.',label='Fit2')
     #plt.scatter(rT,VzT, s =1,c='black', alpha =0.5) # gist_earth YlGn
     #cbar = plt.colorbar()
     #cbar.set_label('Age (Gyr)')
     #plt.scatter(gx,gz,c='r',marker='+',alpha=0.5)
     plt.title("$ Log(\\rho) -R$")
     plt.xlabel('d ($Mpc h^{-1}$)')
-    plt.ylabel("$ \\rho $")
+    plt.ylabel("$ Log( \\rho) $")
     plt.legend()
     #Vc
     fig4= plt.figure(4)
@@ -282,8 +329,12 @@ if __name__ == "__main__":
     fig5= plt.figure(5)
     plt.plot(r,np.log10(M_enclosed0), c='black',linestyle='--', label='Jeans, $\\beta =0$')
     plt.plot(r,np.log10(M_enclosedbeta), c='black', label='Jeans, $\\beta$')
+    plt.plot(r,np.log10(M_enclosed0Fit(r)), c='green',linestyle='--', label='Jeans, $\\beta =0$, fit')
+    plt.plot(r,np.log10(M_enclosedbetaFit(r)), c='green', label='Jeans, $\\beta$, fit')
     plt.plot(RSnap,np.log10(massSnap), c='grey',linestyle=':',label='DM halo')
     plt.plot(Rs,np.log10(MIn), c='grey',linestyle='-.',label='SM')
+    plt.plot(r,np.log10(M_enclosed02), c='gray',linestyle='-.', label='Jeans2, $\\beta =0$')
+    plt.plot(r,np.log10(M_enclosedbeta2), c='gray', label='Jeans2, $\\beta$')
     plt.title("$M_{enclosed}$")
     plt.xlabel('d ($Mpc h^{-1}$)')
     plt.ylabel("$Log(M_{enclosed})$")
@@ -299,9 +350,12 @@ if __name__ == "__main__":
     plt.legend()
     #
     fig7= plt.figure(7)
-    plt.plot(Rs,vr, c='black', linestyle='-', label='$V_r$')
-    plt.plot(Rs,vt, c='black', linestyle='-.',label='$V_{\\theta}$')
-    plt.plot(Rs,vf, c='black',linestyle='--', label='$V_{\\phi}$')
+    plt.plot(Rs,np.abs(vr), c='black', linestyle='-', label='$V_r$')
+    plt.plot(Rs,np.abs(vt), c='black', linestyle='-.',label='$V_{\\theta}$')
+    plt.plot(Rs,np.abs(vf), c='black',linestyle='--', label='$V_{\\phi}$')
+    plt.plot(Rs,np.abs(Sigvr), c='gray', linestyle='-', label='$\\sigma_{V_r}$')
+    plt.plot(Rs,np.abs(Sigvt), c='gray', linestyle='-.',label='$\\sigma_{V_{\\theta}}$')
+    plt.plot(Rs,np.abs(Sigvf), c='gray',linestyle='--', label='$\\sigma{V_{\\phi}}$')
     #plt.plot(RSnap,np.log10(massSnap), c='grey',linestyle=':',label='DM halo')
     #plt.plot(Rs,np.log10(MIn), c='grey',linestyle='-.',label='SM')
     plt.title("$V$")
@@ -309,4 +363,19 @@ if __name__ == "__main__":
     plt.ylabel("$V$")
     plt.legend()
     #
+    fig8= plt.figure(8)
+    #print(Rss)
+    VrHeat,xedge, yedge=np.histogram2d(Rss,VrAll,bins=80)
+    ext=[0,0.2,0,60]#[xedge[0],xedge[-1],yedge[0],yedge[-1]]
+    Xmesh, Ymesh = np.meshgrid(xedge, yedge)
+    plt.title("$V_r-R$")
+    plt.xlabel('d ($Mpc h^{-1}$)')
+    plt.ylabel('$V_r(Km s^{-1})$')
+    #plt.imshow(VrHeat.T, origin='lower')
+    plt.pcolormesh(Xmesh, Ymesh, VrHeat.T, cmap='gist_earth')
+    cbar = plt.colorbar()
+    #cbar.set_label('Age (Gyr)')
+    #print(xedge)
+    #print(yedge)
+    #plt.pcolor()
     plt.show()
