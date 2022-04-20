@@ -25,16 +25,33 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
     #address='/media/shahram/JB3/2021/AllTags/AllTags_262.h5'
     #AllTags_264.h5
-    address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
+    #address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
+    #address='/media/shahram/ShahramWD1/AllTagsPosFixed/test/*.h5'
+    #address='/media/shahram/ShahramWD1/m12i_SH/accretedsmooth/*.h5'
+    #address='/media/shahram/JB3/m12i_SH/accretedsmooth/*.h5'
+    #address='/media/shahram/JB3/m12f_SH/*.h5'
+    address='/media/shahram/JB3/m12b_SH/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
-    gx=29.3575
-    gy=31.0276
-    gz=32.4926
-    Rv=0.139977
+    #m12i
+    #gx=29.3575
+    #gy=31.0276
+    #gz=32.4926
+    #Rv=0.139977
+    #m12f
+    # gx=27.1756
+    # gy=33.4577
+    # gz=32.8438
+    # Rv=0.158065
+    #m12b
+    gx=27.5708
+    gy=29.1913
+    gz=27.5166
+    Rv=0.15109
     fig1= plt.figure(1)
     MetallicityT=[]
     xT=[]
     zT=[]
+    Rss=[]
     for h5name in glob.glob(address):
         print(h5name)
         with h5.File(h5name, "r") as f:
@@ -97,15 +114,17 @@ if __name__ == "__main__":
             xT.extend(x)
             zT.extend(z)
             MetallicityT.extend(Metallicity)
+            rBin=r[r<Rv]
+            Rss.extend(rBin)
             #print(ID0)
             #print(float(Vx0[ID0==313488]))
             #if(len(ID0[ID0==313488])>0):
             #    print("yay!")
-    plt.scatter(xT,zT , c=np.log10(MetallicityT),cmap = 'gist_earth', s =2, alpha =0.8)
+    #plt.scatter(xT,zT , c=np.log10(MetallicityT),cmap = 'gist_earth', s =2, alpha =0.8)
     #cmap = 'gist_earth'    'viridis'  gnuplot   YlGn
-    cbar = plt.colorbar()
-    plt.clim(-7, -2)
-    cbar.set_label('Metallicity')
+    #cbar = plt.colorbar()
+    #plt.clim(-7, -2)
+    #cbar.set_label('Metallicity')
     plt.scatter(gx,gz,c='r',marker='+',alpha=0.5,s=25)
     plt.title("metallicity")
     plt.xlabel('x (Mpc)')
@@ -113,4 +132,73 @@ if __name__ == "__main__":
     #plt.savefig('Metallicity.png')
     #plt.hist(np.log10(MetallicityT),linewidth=2, bins=100, log=False,cumulative=-1, histtype='step', alpha=0.9,color='blue',label='DMO')
     #plt.hist(np.log10(MetallicityT[MetallicityT!=0]),linewidth=2, bins=100, log=False, histtype='step', alpha=0.9,color='blue',label='Z')
+    fig2= plt.figure(2)
+    MetallicityT=np.array(MetallicityT)
+    logzz=np.log10(MetallicityT/0.019)
+    Rss=np.array(Rss)
+    logzz=np.array(logzz)
+    logzz[np.isnan(logzz)]=0.
+    logzz[np.isinf(logzz)]=0.
+    Rss2=Rss[(logzz > -2.5)& (logzz < -0.1)]
+    logzz2=logzz[(logzz > -2.5)& (logzz < -0.1)]
+    zHeat,xedge, yedge=np.histogram2d(Rss2,logzz2,bins=[50,50])#, weights=SM)
+    #ext=[xedge[0],xedge[-1],-5,yedge[-1]]#[0,12,-5,0]#[xedge[0],xedge[-1],yedge[0],yedge[-1]]
+    Xmesh, Ymesh = np.meshgrid(xedge, yedge)
+    plt.title("$Metallicity-R$")
+    plt.xlabel('$R$')
+    plt.ylabel('$Metallicity$')
+    #plt.imshow(VrHeat.T, origin='lower')
+    plt.pcolormesh(Xmesh, Ymesh, zHeat.T,cmap='gist_earth')#,extent=ext)# cmap='gist_earth')
+    cbar = plt.colorbar()
+    #cross section cuts
+    fig3=plt.figure(3)
+    #ax1=fig3.add_subplot(111)
+    #colors=ax1.pcolormesh(xT,zT,np.log10(MetallicityT), cmap='RdBu')#, vmin=np.min(np.log10(MetallicityT)), vmax=np.max(np.log10(MetallicityT)))
+    #ax1.set_title('Metallicity')
+    #ax1.axis([xT.min(), xT.max(), zT.min(),zT.max()])
+    #fig3.colorbar(colors,ax=ax1)
+    pCount,xHist, zHist=np.histogram2d(xT,zT,bins=[60,60])
+    XHistmesh, ZHistmesh = np.meshgrid(xHist, zHist)
+    print(pCount.shape)
+    print(logzz.shape)
+    logzHist=pCount*0.0 #just to create an empty array with the same shape
+    print(zHist)
+    xT=np.array(xT)
+    zT=np.array(zT)
+    logzz=np.array(logzz)
+    zCutUp=0
+    zCutDown=-3.0
+    xRange=np.array(xT[(logzz > zCutDown)& (logzz < zCutUp)])
+    zRange=np.array(zT[(logzz >zCutDown)& (logzz < zCutUp)])
+    logzRange=np.array(logzz[(logzz > zCutDown)& (logzz < zCutUp)])
+    for ii in range(0,len(xHist)-1):
+        for jj in range(0,len(zHist)-1):
+            xMin=xHist[ii]
+            xMax=xHist[ii+1]
+            zMin=zHist[jj]
+            zMax=zHist[jj+1]
+            xRangeNew=xRange[(xRange>xMin) & (xRange<xMax)]
+            zRangeNew=zRange[(xRange>xMin) & (xRange<xMax)]
+            logzRangeNew=logzRange[(xRange>xMin) & (xRange<xMax)]
+            #print(len(xRangeNew),len(zRangeNew),len(logzRangeNew))
+            #print(len(zMin))
+            #print(len(xRangeNew[(zRangeNew>zMin)]))
+            xRangeNew2=xRangeNew[(zRangeNew>zMin) & (zRangeNew<zMax)]
+            zRangeNew2=zRangeNew[(zRangeNew>zMin) & (zRangeNew<zMax)]
+            logzRangeNew2=logzRangeNew[(zRangeNew>zMin) & (zRangeNew<zMax)]
+            #print(xHist[ii])
+            #print(xHist[ii+1])
+            #print(np.min([xHist[ii],xHist[ii+1]]))
+            #logzRangeNew=logzRange[(xRange>xHist[ii]) & (xRange<xHist[ii+1]) & (zRange>zHist[jj]) & (zRange<zHist[jj+1])]
+            #print(zRange[xRange>xHist[ii]])
+            #print(xRange<xHist[ii+1])
+            #zRangeNew=zRange[(xRange>xHist[ii]) & (xRange<xHist[ii+1])]
+            #logzRangeNew=logzRangeNew[(zRangeNew<zHist[jj]) & (zRangeNew<zHist[jj+1])]
+            logzHist[ii,jj]=np.mean(logzRangeNew2)
+    #zz=logzz.reshape(len(zHist),len(xHist))
+    plt.pcolormesh(XHistmesh, ZHistmesh, logzHist,cmap='jet')#,extent=ext)# cmap='gist_earth')
+    cbar = plt.colorbar()
+    plt.title("$Metallicity$")# (-1 > 0)$")
+    plt.xlabel('$x [Mpc h^{-1}]$')
+    plt.ylabel('$z[Mpc h^{-1}]$')
     plt.show()

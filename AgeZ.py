@@ -25,7 +25,9 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
     #address='/media/shahram/JB3/2021/AllTags/AllTags_262.h5'
     #AllTags_264.h5
-    address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
+    #address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
+    #address='/media/shahram/ShahramWD1/AllTagsPosFixed/rem/*.h5'
+    address='/media/shahram/ShahramWD1/m12i_SH/accretedsmooth/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
     gx=29.3575
     gy=31.0276
@@ -37,6 +39,7 @@ if __name__ == "__main__":
     ageT=[]
     xT=[]
     zT=[]
+    Rss=[]
     for h5name in glob.glob(address):
         print(h5name)
         with h5.File(h5name, "r") as f:
@@ -94,6 +97,7 @@ if __name__ == "__main__":
             x=x0[r<Rv]
             y=y0[r<Rv]
             z=z0[r<Rv]
+            rBin=r[r<Rv]
             f.close()
             print("finished finding particles in Rv")
             xT.extend(x)
@@ -101,12 +105,15 @@ if __name__ == "__main__":
             ageT.extend(age)
             MetallicityT.extend(Metallicity)
             SMT.extend(StellarMass)
+            #Rss.extend(rBin)
             #print(ID0)
             #print(float(Vx0[ID0==313488]))
             #if(len(ID0[ID0==313488])>0):
             #    print("yay!")
     #plt.scatter(ageT,MetallicityT , c=SMT,cmap = 'YlGn', s =1, alpha =0.2)
-    plt.scatter(ageT,np.log10(MetallicityT) , s =1, alpha =0.9)
+    MetallicityT=np.array(MetallicityT)
+    logzz=np.log10(MetallicityT/0.019)
+    plt.scatter(ageT,logzz , s =1, alpha =0.9)
     #cbar = plt.colorbar()
     #cbar.set_label('Age (Gyr)')
     #plt.scatter(gx,gz,c='r',marker='+',alpha=0.4)
@@ -114,4 +121,22 @@ if __name__ == "__main__":
     plt.xlabel('Age')
     plt.ylabel('Metallicity')
     #plt.savefig('Age.png')
+    fig2= plt.figure(2)
+    #print(Rss)
+    ageT=np.array(ageT)
+    logzz=np.array(logzz)
+    logzz[np.isnan(logzz)]=0.
+    logzz[np.isinf(logzz)]=0.
+    ageT2=ageT[logzz > -4]
+    logzz=logzz[logzz>-4]
+    zHeat,xedge, yedge=np.histogram2d(ageT2,logzz,bins=[50,50])#, weights=SM)
+    ext=[xedge[0],xedge[-1],-5,yedge[-1]]#[0,12,-5,0]#[xedge[0],xedge[-1],yedge[0],yedge[-1]]
+    Xmesh, Ymesh = np.meshgrid(xedge, yedge)
+    plt.title("$Age-Metallicity$")
+    plt.xlabel('$Age[Gyr]$')
+    plt.ylabel('$Z$')
+    #plt.imshow(VrHeat.T, origin='lower')
+    plt.pcolormesh(Xmesh, Ymesh, zHeat.T,cmap='gist_earth')#,extent=ext)# cmap='gist_earth')
+    cbar = plt.colorbar()
+    #now just a cross section.
     plt.show()

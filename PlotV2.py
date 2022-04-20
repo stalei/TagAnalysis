@@ -24,6 +24,7 @@ from scipy.optimize import curve_fit
 plt.rcParams["font.size"] =13
 from scipy.interpolate import UnivariateSpline
 import math
+from scipy.spatial.transform import Rotation as R
 
 def FitMass(variables,a,b):
 	#a,b,c=params
@@ -35,7 +36,7 @@ def FitMass(variables,a,b):
 
 
 
-G=2.6E-5
+G=6.6E-6
 ######################################
 #mass unit is M_sun
 #m12b
@@ -70,44 +71,51 @@ if __name__ == "__main__":
     #address='/media/shahram/SD/Sample100Mpc/m12b/m12b_SH/*.h5'
     #address='/media/shahram/JB3/m12i_SH/accretedsmooth/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
+    #Halo info from Rockstar
     #m12i
-    #m12b: 27.5708,29.1913,27.5166,8.01988e+11,0.15109,41,3.11153e+10,0,0,0,470366
-    ##m12f: 27.1756,33.4577,32.8438,9.1826e+11,0.158065
-    #4743 3092690 9.359e+11 9.359e+11 202.266769 175.132599 36.814861 167.140518 27.570570 29.191301 27.516590 -80.757416 -28.606602 -103.005913 3.08601e+10 -6.20163e+11 1.37631e+12 -1.12312e+16 0.0439077 0.000031 0.272087 -77.683327 -28.382364 -103.024040 0.084158 563571 1.013820e+12 8.018820e+11 6.181135e+11 3.439163e+11 7.166698 3.082309 0.039981 0.678771 0.597124 9.754769 2.045950 -2.318844 0.614595 0.531647 7.884814 1.441257 -2.065913 18.070126 17.765816 0.537297 1.067220e+12 4.676613e+11 72.334473 39743 -1 -1 4465312 10000000000.000000
-    #10156 3370251 1.106e+12 1.106e+12 213.875168 180.465057 49.707188 176.831360 27.169409 33.463512 32.848351 -154.445251 167.958664 121.871223 -1.07745e+12 -2.29755e+12 -2.17838e+11 -1.31142e+16 0.0526631 0.000039 0.276490 -150.686554 162.742706 109.950363 0.081887 576036 1.234221e+12 9.089681e+11 7.032026e+11 3.860202e+11 10.361948 13.544039 0.051022 0.513396 0.446613 10.009308 -5.450640 9.133945 0.467729 0.431883 7.850304 -4.099245 7.586720 21.718937 21.017351 0.568074 1.221494e+12 6.061415e+11 77.199913 59149 -1 -1 5614381 10000000000.000000
-    #gx=27.1756 #27.5708 #29.3575
-    #gy=33.4577 #29.1913 #31.0276
-    #gz=32.8438 #27.5166 #32.4926
-    #Rv=0.158065 #0.15109 #0.139977
     #m12i: 29.3575,31.0276,32.4926,6.37801e+11,0.139977,264,5.1374e+10,0,0,0,3.99904e+
-    #m12b: 27.5708,29.1913,27.5166,8.01988e+11,0.15109,41,3.11153e+08,0,0,0,470366
-    #m12f: 27.1756,33.4577,32.8438,9.1826e+11,0.158065
+    #6440 2389286 7.631e+11 7.631e+11 188.977402 149.599915 54.658009 143.317734 29.357544 31.029387 32.492146 -52.824707 72.188049 100.574295 1.37545e+10 7.13653e+10 -1.10587e+11 -7.5704e+15 0.00526233 0.000045 0.274646 -46.014793 73.618195 95.998154 0.079915 354301 8.420496e+11 6.376857e+11 4.718821e+11 2.158707e+11 4.269987 8.328306 0.004924 0.628998 0.506087 1.346174 11.681837 -3.791546 0.619734 0.468343 0.902458 8.931920 -2.634730 24.263170 25.247494 0.509286 8.279805e+11 4.877253e+11 73.982613 41996 -1 -1 3876024 10000000000.000000
+    #m12b
+    #m12b: 27.5708,29.1913,27.5166,8.01988e+11,0.15109,41,3.11153e+10,0,0,0,470366
+    #4743 3092690 9.359e+11 9.359e+11 202.266769 175.132599 36.814861 167.140518 27.570570 29.191301 27.516590 -80.757416 -28.606602 -103.005913 3.08601e+10 -6.20163e+11 1.37631e+12 -1.12312e+16 0.0439077 0.000031 0.272087 -77.683327 -28.382364 -103.024040 0.084158 563571 1.013820e+12 8.018820e+11 6.181135e+11 3.439163e+11 7.166698 3.082309 0.039981 0.678771 0.597124 9.754769 2.045950 -2.318844 0.614595 0.531647 7.884814 1.441257 -2.065913 18.070126 17.765816 0.537297 1.067220e+12 4.676613e+11 72.334473 39743 -1 -1 4465312 10000000000.000000
+    #m12f
+    ##m12f: 27.1756,33.4577,32.8438,9.1826e+11,0.158065
+    #10156 3370251 1.106e+12 1.106e+12 213.875168 180.465057 49.707188 176.831360 27.169409 33.463512 32.848351 -154.445251 167.958664 121.871223 -1.07745e+12 -2.29755e+12 -2.17838e+11 -1.31142e+16 0.0526631 0.000039 0.276490 -150.686554 162.742706 109.950363 0.081887 576036 1.234221e+12 9.089681e+11 7.032026e+11 3.860202e+11 10.361948 13.544039 0.051022 0.513396 0.446613 10.009308 -5.450640 9.133945 0.467729 0.431883 7.850304 -4.099245 7.586720 21.718937 21.017351 0.568074 1.221494e+12 6.061415e+11 77.199913 59149 -1 -1 5614381 10000000000.000000
+    ######################################
     #m12i
-    #gx=29.3575
-    #gy=31.0276
-    #gz=32.4926
+    #gpos=np.array([29.3575,31.0276,32.4926])
+    #gvel=np.array([-52.883121,72.168541,100.636299])
+    #gJ=np.array([1.37545e+10,7.13653e+10,-1.10587e+11])
     #Rv=0.139977
     #m12b
-    #gx=27.5708
-    #gy=29.1913
-    #gz=27.5166
+    #gpos=np.array([27.5708,29.1913,27.5166])
+    #gvel=np.array([-80.757416,-28.606602,-103.005913])
+    #gJ=np.array([3.08601e+10,-6.20163e+11,1.37631e+12])
     #Rv=0.15109
     #m12f
-    gx=27.1756
-    gy=33.4577
-    gz=32.8438
+    gpos=np.array([27.1756,33.4577,32.8438])
+    gvel=np.array([-154.445251,167.958664,121.871223])
+    gJ=np.array([-1.07745e+12,-2.29755e+12,-2.17838e+11])
     Rv=0.158065
-    #m12i -52.883121 72.168541 100.636299
-    #m12b  -80.757416 -28.606602 -103.005913
-    VxH=-154.445251
-    #VxH=-80.757416
-    #VxH=-52.883121
-    VyH=167.958664 #
-    #VyH=-28.606602 #
-    #VyH=72.168541
-    VzH=121.871223 #
-    #VzH=-103.005913 #
-    #VzH=100.636299
+    ## bins number
+    NBins=10
+    ##############
+    gx=gpos[0]
+    gy=gpos[1]
+    gz=gpos[2]
+    VxH=gvel[0]
+    VyH=gvel[1]
+    VzH=gvel[2]
+    Jx=gJ[0]
+    Jy=gJ[1]
+    Jz=gJ[2]
+    JNorm=np.sqrt(Jx**2.+Jy**2.+Jz**2.)
+    JxyNorm=np.sqrt(Jx**2.+Jy**2.)
+    rotationAxis= np.array([Jy/JxyNorm,-Jx/JxyNorm,0])
+    rotationAngle=np.arccos(Jz/JNorm)
+    rotationVector=rotationAngle*rotationAxis
+    rotationJ=R.from_rotvec(rotationVector)
+    #change them to a list when you're done with tests!
     fig1= plt.figure(1)
     VxT=[]
     VyT=[]
@@ -205,12 +213,24 @@ if __name__ == "__main__":
     #cbar = plt.colorbar()
     #cbar.set_label('Age (Gyr)')
     #plt.scatter(gx,gz,c='r',marker='+',alpha=0.5)
+    #Wr better rotate these to disk coordinates
+    for pp in range(0,len(xT)):
+        pos=[xT[pp],yT[pp],zT[pp]]
+        vel=[VxT[pp],VyT[pp],VzT[pp]]
+        rotPos=rotationJ.apply(pos)
+        rotVel=rotationJ.apply(vel)
+        xT[pp]=rotPos[0]
+        yT[pp]=rotPos[1]
+        zT[pp]=rotPos[2]
+        VxT[pp]=rotVel[0]
+        VyT[pp]=rotVel[1]
+        VzT[pp]=rotVel[2]
     plt.title("Vz-R")
     plt.xlabel('d ($Mpc h^{-1}$)')
     plt.ylabel('Vz $(Km s^{-1})$')
     #now binning
     fig2= plt.figure(2)
-    NBins=10
+    #NBins=10
     rBins=np.linspace(0,Rv,NBins+1)
     Rs=[0.]*NBins
     SigmaV=[0.]*NBins
@@ -236,7 +256,10 @@ if __name__ == "__main__":
     VxT=np.array(VxT)
     VyT=np.array(VyT)
     VzT=np.array(VzT)
-    SMT=np.array(SMT)
+    SMT=np.array(SMT)#*2.2.3726664349995558E+005
+    #mass resolution in Fire 2.3726664349995558E-005 and mass unit is E019 M_sun in Gadget, h is missing here
+    #massConversion=(2.3726664349995558E+005)/0.702
+    #SMT*=massConversion
     mm=0.
     VrAll=[]
     Rss=[]
@@ -256,12 +279,13 @@ if __name__ == "__main__":
         SMBin[np.isinf(SMBin)]=0.
         #print("SMBin:")
         #print(SMBin[np.isinf(SMBin)])
-        mm+=np.sum(SMBin,dtype=np.float64)
+        totMIn=np.sum(SMBin,dtype=np.float64) #mass unit is tha same as tag unit
         #for j in range(0,len(SMBin)):
         #    mm+=SMBin[j]
+        mm+=totMIn
         MIn[i]=mm
-        dV=(4./3.)*3.1415*((Rout*1000.)**3.-(Rin*1000.)**3.)
-        rho=SMBin/dV
+        dV=(4./3.)*3.1415*((Rout*1000.)**3.-(Rin*1000.)**3.) #unit is kpc^3
+        rho=totMIn/dV
         Density[i]=rho
         print("m:%g"%mm)
         #print(SMBin)
@@ -297,10 +321,10 @@ if __name__ == "__main__":
         VrAll.extend(VrBin)
         #rss=np.sqrt(xBin**2.+yBin**2.+zBin**2.)
         #print(rBin)
-        Rss.extend(rBin)
+        Rss.extend(rBin) #Mpc
         #beta[i]/=2.
         #massBin=np.nansum(SMBin)
-        Density[i]=np.sum(rho)#massBin/dV
+        #Density[i]=np.sum(rho)#massBin/dV
         Vc[i]=Vcirc#statistics.mean(Vcirc)
     #Now fitting V_sigma
     #
@@ -340,9 +364,9 @@ if __name__ == "__main__":
         dLnRho=np.log(DensityFit(Rs[i+1]))-np.log(DensityFit(Rs[i]))
         #M_enclosed[i]=np.abs((Dsigma/DR)*(r[i]**2.)/G)
         M_enclosed0[i]=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr))*(r[i]*1000.*Vr2MeanFit(Rs[i+1]))/G)
-        M_enclosed0[i]*=0.7
+        #M_enclosed0[i]*=0.7
         M_enclosedbeta[i]=np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr)+2*beta[i+1])*(r[i]*1000.*Vr2MeanFit(Rs[i+1]))/G)
-        M_enclosedbeta[i]*=0.7 #damn little h
+        #M_enclosedbeta[i]*=0.7 #damn little h
         print(i)
         M_enclosed02[i]=np.abs(((dLnRho2[i]/dLnr2[i])+(dLnVr22[i]/dLnr2[i]))*(Rs[i]*Vr2MeanFit(Rs[i]))/G)
         M_enclosedbeta2[i]=np.abs(((dLnRho2[i]/dLnr2[i])+(dLnVr22[i]/dLnr2[i])+2*beta[i])*(Rs[i]*Vr2MeanFit(Rs[i]))/G)#np.abs(((dLnRho/dLnr)+(dLnVr2/dLnr)+2*beta[i+1])*(r[i]*Vr2MeanFit(Rs[i+1]))/G)

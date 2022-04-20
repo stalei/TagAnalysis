@@ -23,20 +23,36 @@ plt.rcParams["font.size"] =12
 if __name__ == "__main__":
     #address='*.h5'
     #address='/media/shahram/SD/Sample100Mpc/m12i/tags/rem/AllTags_161.h5'
-    #address='/media/shahram/JB3/2021/AllTags/AllTags_170.h5'
+    #address='/media/shahram/JB3/2021/AllTags/AllTags_262.h5'
     #AllTags_264.h5
     #address='/media/shahram/JB3/2021/AllTagsPosFixed/rem/*.h5'
-    address='/media/shahram/ShahramWD1/AllTagsPosFixed/test/*.h5'
+    address='/media/shahram/ShahramWD1/AllTagsPosFixed/rem/*.h5'
+    #address='/media/shahram/SD/Sample100Mpc/m12b/m12b_SH/*.h5'
+    #address='/media/shahram/JB3/m12b_SH/*.h5'
     #AllTagsPosFixedPosFixed_194.h5
+    #m12i: 29.3575,31.0276,32.4926,6.37801e+11,0.139977,264,5.1374e+10,0,0,0,3.99904e+
+    #m12b: 27.5708,29.1913,27.5166,8.01988e+11,0.15109,41,3.11153e+08,0,0,0,470366
     gx=29.3575
     gy=31.0276
     gz=32.4926
     Rv=0.139977
+    #gx=27.5708 #29.3575
+    #gy=29.1913 #31.0276
+    #gz=27.5166 #32.4926
+    #Rv=0.15109 #0.139977
     fig1= plt.figure(1)
-    SMT=[]
+    ageT=[]
     xT=[]
     zT=[]
     Rss=[]
+    SM=[]
+    #now get the particle list
+    PList='/media/shahram/SD/Sample100Mpc/m12i/z0/halos_m12iC_z0_264.particles'
+    plist=np.genfromtxt(PList, skip_header=18,comments='#')
+    if plist is None:
+        print ("Error, sorry, I couldn't read the halo binary file.!")
+        sys.exit(1)
+    pids=np.array(plist[:,9])
     for h5name in glob.glob(address):
         print(h5name)
         with h5.File(h5name, "r") as f:
@@ -46,47 +62,47 @@ if __name__ == "__main__":
             print("Read keys")
             a_group_key = f_key[0]
             age0 =np.array(f[a_group_key])
-            print("0")
+            print("Age")
             a_group_key = f_key[1]
             GID0 = np.array(f[a_group_key])
-            print("1")
+            print("GID")
             a_group_key = f_key[2]
             HID0 = np.array(f[a_group_key])
-            print("2")
+            print("HID")
             a_group_key = f_key[3]
             ID0 =np.array(f[a_group_key])
-            print("3")
+            print("ID")
             a_group_key = f_key[4]
             Metallicity0=np.array(f[a_group_key])
-            print("4")
+            print("Metallicity")
             a_group_key = f_key[5]
             StellarMass0 =np.array(f[a_group_key])
-            print("5")
+            print("Stellar Mass")
             a_group_key = f_key[6]
             Vx0 =np.array(f[a_group_key])
-            print("6")
+            print("Vx")
             a_group_key = f_key[7]
             Vy0 =np.array(f[a_group_key])
-            print("7")
+            print("Vy")
             a_group_key = f_key[8]
             Vz0=np.array(f[a_group_key])
-            print("8")
+            print("Vz")
             a_group_key = f_key[9]
             x0 =np.array(f[a_group_key])
-            print("9")
+            print("X")
             a_group_key = f_key[10]
             y0 =np.array(f[a_group_key])
-            print("10")
+            print("Y")
             a_group_key = f_key[11]
             z0 =np.array(f[a_group_key])
-            print("11")
+            print("Z")
             print("finished reading")
             dx=x0-gx
             dy=y0-gy
             dz=z0-gz
             r=(dx*dx+dy*dy+dz*dz)**0.5
             print("separation is done")
-            print("len age=%d, len r=%d"%(len(age0),len(r)))
+            #print("len age=%d, len r=%d"%(len(age0),len(r)))
             print(r<Rv)
             age=age0[r<Rv]
             Metallicity=Metallicity0[r<Rv]
@@ -96,41 +112,37 @@ if __name__ == "__main__":
             z=z0[r<Rv]
             rBin=r[r<Rv]
             f.close()
-            print("finished finding particles in Rv, %d"%len(x))
+            print("finished finding particles in Rv")
             xT.extend(x)
             zT.extend(z)
-            SMT.extend(StellarMass)
+            ageT.extend(age)
             Rss.extend(rBin)
+            SM.extend(StellarMass)
             #print(ID0)
             #print(float(Vx0[ID0==313488]))
             #if(len(ID0[ID0==313488])>0):
             #    print("yay!")
-    SMT=np.array(SMT)
-    print("nan:%d"%len(SMT[np.isnan(SMT)]))
-    print("inf:%d"%len(SMT[np.isinf(SMT)]))
-    print("All:%d"%len(SMT))
-    SMT[np.isnan(SMT)]=0.
-    SMT[np.isinf(SMT)]=0.
-    print("len clenned:%d"%len(SMT[SMT>0]))
-    plt.scatter(xT,zT , c=np.log10(SMT),cmap = 'gist_earth', s =2, alpha =0.8) ## gist_earth YlGn
-    #np.log10(StellarMass)
+    plt.scatter(xT,zT , c=ageT,cmap = 'gist_earth', s =1, alpha =0.3) # gist_earth YlGn
     cbar = plt.colorbar()
-    plt.clim(0.2, 7.5)
-    cbar.set_label('Stellar Mass')
-    plt.scatter(gx,gz,c='r',marker='+',alpha=0.4)
-    plt.title("Log10(SM) $M_\\odot$")
+    cbar.set_label('Age (Gyr)')
+    plt.scatter(gx,gz,c='r',marker='+',alpha=0.5)
+    plt.title("Age")
     plt.xlabel('x (Mpc)')
     plt.ylabel('z (Mpc)')
-    #plt.savefig('StellarMass.png')
+    #plt.savefig('Age.png')
     fig2= plt.figure(2)
     #print(Rss)
-    SMHeat,xedge, yedge=np.histogram2d(Rss,SMT,bins=[50,25])#, weights=SM)
-    #ext=[0,13.7,0,0,60]#[xedge[0],xedge[-1],yedge[0],yedge[-1]]
+    Rss=np.array(Rss)
+    ageT=np.array(ageT)
+    Rss2=Rss#[(ageT > 3.5) & (ageT < 4)]
+    ageT2=ageT#[(ageT > 3.5) & (ageT < 4)]
+    ageHeat,xedge, yedge=np.histogram2d(Rss2,ageT2,bins=[40,40])#, weights=SM) DOUBLE BINS
+    #ext=[xedge[0],xedge[-1],-5,yedge[-1]]
     Xmesh, Ymesh = np.meshgrid(xedge, yedge)
-    plt.title("$Stellar Mass-R$")
+    plt.title("$Age (weighted)-R$")
     plt.xlabel('d [$Mpc h^{-1}$]')
-    plt.ylabel('$Stellar Mass[M_\\odot]$')
+    plt.ylabel('$Age[Gyr]$')
     #plt.imshow(VrHeat.T, origin='lower')
-    plt.pcolormesh(Xmesh, Ymesh, SMHeat.T, cmap='gist_earth')
+    plt.pcolormesh(Xmesh, Ymesh, ageHeat.T,cmap='jet')#,extent=ext)# cmap='gist_earth')
     cbar = plt.colorbar()
     plt.show()
